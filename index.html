@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Barnacle — Your Drink's New Best Friend</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    a { text-decoration: none; color: inherit; }
+
+    :root {
+      --navy:        #0f172a;
+      --slate:       #1e293b;
+      --mid:         #475569;
+      --light:       #f8fafc;
+      --white:       #ffffff;
+      --accent:      #0ea5e9;
+      --accent-dark: #0284c7;
+      --radius:      12px;
+      --shadow:      0 4px 24px rgba(15,23,42,.12);
+    }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--accent); color: var(--white);
+      font-size: 1rem; font-weight: 700; letter-spacing: .02em;
+      padding: 16px 36px; border-radius: 50px; border: none; cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(14,165,233,.35);
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(14,165,233,.45); }
+    .btn-outline {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: transparent; color: var(--white);
+      font-size: 1rem; font-weight: 700;
+      padding: 14px 32px; border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.6); cursor: pointer;
+      transition: background .2s, border-color .2s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+
+    /* ============================================================
+       SECTION 1 — HERO
+       Lifestyle photo + massive handwritten watermark text
+    ============================================================ */
+    #hero {
+      position: relative; min-height: 100svh;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    #hero .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('images/hero-hydro-wide.png');
+      background-size: cover; background-position: center 60%;
+    }
+    /* Dark overlay for readability */
+    #hero .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,18,35,.35) 0%,
+        rgba(10,18,35,.50) 55%,
+        rgba(10,18,35,.75) 100%
+      );
+    }
+    /* Giant watermark brand text — matches existing site energy */
+    #hero .hero-watermark {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; overflow: hidden;
+    }
+    #hero .hero-watermark span {
+      font-size: clamp(5rem, 18vw, 16rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: .9;
+      text-align: center;
+      color: transparent;
+      -webkit-text-stroke: 2px rgba(255,255,255,.13);
+      text-transform: uppercase;
+      white-space: nowrap;
+      user-select: none;
+      /* Permanent Marker style via web font */
+      font-family: 'Permanent Marker', 'Inter', cursive;
+    }
+    #hero .hero-content {
+      position: relative; z-index: 2;
+      text-align: center; padding: 80px 24px 120px; max-width: 820px;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--accent); background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.4);
+      padding: 6px 16px; border-radius: 50px; margin-bottom: 28px;
+    }
+    #hero h1 {
+      font-size: clamp(2.6rem, 6.5vw, 5rem);
+      font-weight: 900; line-height: 1.06; letter-spacing: -.025em; color: var(--white); margin-bottom: 24px;
+    }
+    #hero h1 em { font-style: normal; color: var(--accent); }
+    #hero .hero-sub {
+      font-size: clamp(1rem, 2.2vw, 1.2rem); color: rgba(255,255,255,.82);
+      line-height: 1.65; max-width: 560px; margin: 0 auto 44px;
+    }
+    .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      z-index: 2; color: rgba(255,255,255,.45); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .scroll-hint span { animation: bounce 2s infinite; display: block; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+    /* ============================================================
+       SHARED CONTAINER
+    ============================================================ */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ============================================================
+       SECTION 2 — WHY / FEATURES (moved before buy)
+    ============================================================ */
+    #features { padding: 96px 0; background: var(--light); }
+    .section-header { text-align: center; margin-bottom: 72px; }
+    .section-eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+    .section-title { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; letter-spacing: -.025em; color: var(--navy); max-width: 680px; margin: 0 auto 16px; }
+    .section-sub { font-size: 1rem; color: var(--mid); max-width: 520px; margin: 0 auto; line-height: 1.65; }
+
+    /* Pain → Solution row */
+    .pain-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 80px;
+    }
+    .pain-card {
+      background: var(--white); border-radius: var(--radius); padding: 32px 28px;
+      box-shadow: var(--shadow);
+    }
+    .pain-icon { font-size: 2rem; margin-bottom: 16px; }
+    .pain-card h3 { font-size: 1.05rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+    .pain-card p { font-size: .9rem; color: var(--mid); line-height: 1.65; }
+
+    /* Feature rows */
+    .feature-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      overflow: hidden; border-radius: var(--radius);
+      box-shadow: var(--shadow); margin-bottom: 40px;
+    }
+    .feature-row:last-child { margin-bottom: 0; }
+    .feature-row.reverse { direction: rtl; }
+    .feature-row.reverse > * { direction: ltr; }
+    .feature-img { aspect-ratio: 4/5; overflow: hidden; }
+    .feature-img img { transition: transform .6s ease; }
+    .feature-img:hover img { transform: scale(1.04); }
+    .feature-text {
+      background: var(--white); display: flex; flex-direction: column; justify-content: center;
+      padding: 56px 52px;
+    }
+    .ft-eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .feature-text h3 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 900; letter-spacing: -.02em; color: var(--navy); line-height: 1.15; margin-bottom: 18px; }
+    .feature-text p { font-size: 1rem; color: var(--mid); line-height: 1.7; }
+    .feat-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78rem; font-weight: 700; color: var(--navy);
+      background: var(--light); border-radius: 50px; padding: 6px 14px; margin-top: 24px; align-self: flex-start;
+    }
+
+    /* ============================================================
+       SECTION 3 — BUY / PRODUCT
+    ============================================================ */
+    #buy { padding: 96px 0; background: var(--white); }
+    .buy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+
+    /* Gallery */
+    .product-gallery { position: relative; }
+    .gallery-main {
+      border-radius: var(--radius); overflow: hidden; aspect-ratio: 1/1;
+      background: var(--light); cursor: zoom-in;
+    }
+    .gallery-main img { transition: opacity .18s; }
+    .gallery-thumbs { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .gallery-thumb {
+      width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+      border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: var(--light);
+      transition: border-color .2s;
+    }
+    .gallery-thumb.active, .gallery-thumb:hover { border-color: var(--accent); }
+    .gallery-thumb img { object-fit: cover; }
+
+    /* Conversion column */
+    .product-info { padding-top: 8px; }
+    .product-label { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    .product-info h2 { font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 900; letter-spacing: -.03em; color: var(--navy); margin-bottom: 16px; }
+    .product-tagline { font-size: 1.05rem; color: var(--mid); line-height: 1.6; margin-bottom: 20px; }
+
+    /* Description */
+    .product-description {
+      font-size: .9rem; color: var(--mid); line-height: 1.75; margin-bottom: 28px;
+      padding: 20px; background: var(--light); border-radius: var(--radius);
+      border-left: 3px solid var(--accent);
+    }
+    .product-description p + p { margin-top: 10px; }
+
+    .price-block { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; }
+    .price { font-size: 2.2rem; font-weight: 900; color: var(--navy); }
+    .price-note { font-size: .85rem; color: var(--mid); }
+
+    /* Feature bullets */
+    .features-list { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+    .features-list li { display: flex; align-items: flex-start; gap: 12px; font-size: .92rem; color: var(--slate); line-height: 1.5; }
+    .feat-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(14,165,233,.1); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .95rem; }
+    .features-list strong { display: block; font-weight: 700; color: var(--navy); }
+
+    /* Add to cart */
+    .add-to-cart-btn {
+      width: 100%; padding: 18px 24px;
+      font-size: 1.05rem; font-weight: 800; letter-spacing: .02em;
+      background: var(--navy); color: var(--white);
+      border: none; border-radius: 50px; cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(15,23,42,.25);
+    }
+    .add-to-cart-btn:hover { background: var(--slate); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(15,23,42,.35); }
+    .trust-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-size: .78rem; color: var(--mid); margin-top: 10px; }
+    .trust-row span { display: flex; align-items: center; gap: 5px; }
+
+    /* ============================================================
+       SECTION 4 — MAKE IT YOURS (CONFIGURATOR)
+    ============================================================ */
+    #configurator {
+      padding: 96px 0;
+      background: var(--navy);
+    }
+
+    #configurator .section-header { text-align: center; margin-bottom: 64px; }
+    #configurator .section-eyebrow {
+      font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    #configurator h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 900; letter-spacing: -.025em; color: var(--white);
+      max-width: 600px; margin: 0 auto 16px;
+    }
+    #configurator .section-sub {
+      font-size: 1rem; color: rgba(255,255,255,.6); max-width: 520px; margin: 0 auto;
+    }
+
+    .config-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start;
+    }
+
+    /* Live Preview Canvas */
+    .config-preview-wrap { position: sticky; top: 24px; }
+    .config-preview-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.4); margin-bottom: 16px; text-align: center;
+    }
+    .config-canvas-container {
+      position: relative; border-radius: 20px; overflow: hidden;
+      background: #1a1008;
+      aspect-ratio: 1/1;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 48px rgba(0,0,0,.5);
+    }
+    #previewCanvas { width: 100%; height: 100%; border-radius: 20px; }
+    .preview-badge {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .7rem; font-weight: 700; color: #16a34a;
+      background: rgba(22,163,74,.15); border: 1px solid rgba(22,163,74,.3);
+      border-radius: 50px; padding: 5px 14px; white-space: nowrap;
+    }
+    .preview-badge::before { content: '●'; font-size: .55rem; }
+
+    /* Controls Panel */
+    .config-controls { display: flex; flex-direction: column; gap: 32px; }
+    .config-group {}
+    .config-group-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.45); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .config-group-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+
+    /* Base color swatches */
+    .base-swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+    .base-swatch {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 3px solid transparent; cursor: pointer;
+      transition: border-color .2s, transform .15s, box-shadow .2s;
+    }
+    .base-swatch:hover { transform: scale(1.12); }
+    .base-swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,165,233,.3); }
+    .base-swatch[data-color="white"] { background: #f8fafc; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
+    .base-swatch[data-color="black"] { background: #1a1a1a; }
+    .base-swatch[data-color="pink"]  { background: #ec4899; }
+    .swatch-label { font-size: .75rem; color: rgba(255,255,255,.5); margin-top: 6px; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,.2); border-radius: var(--radius);
+      padding: 28px 20px; text-align: center; cursor: pointer;
+      transition: border-color .2s, background .2s; position: relative; overflow: hidden;
+    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent); background: rgba(14,165,233,.05); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-icon { font-size: 2rem; margin-bottom: 10px; }
+    .upload-title { font-size: .9rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .upload-sub { font-size: .78rem; color: rgba(255,255,255,.4); }
+    .upload-preview-strip { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .upload-thumb { width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255,255,255,.15); cursor: pointer; flex-shrink: 0; transition: border-color .2s; }
+    .upload-thumb.active { border-color: var(--accent); }
+    .upload-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Preset patterns */
+    .preset-patterns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .preset-btn {
+      padding: 7px 14px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.05); color: rgba(255,255,255,.7);
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .preset-btn:hover, .preset-btn.active { background: rgba(14,165,233,.15); border-color: var(--accent); color: var(--white); }
+
+    /* Text customization */
+    .config-input {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+      border-radius: 10px; color: var(--white); font-size: .95rem;
+      outline: none; transition: border-color .2s;
+    }
+    .config-input::placeholder { color: rgba(255,255,255,.3); }
+    .config-input:focus { border-color: var(--accent); }
+
+    /* Font picker */
+    .font-picker-wrap { position: relative; }
+    .font-picker-trigger {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+      border-radius: 10px; color: var(--white); font-size: .95rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      transition: border-color .2s;
+    }
+    .font-picker-trigger:hover { border-color: rgba(255,255,255,.3); }
+    .font-picker-trigger.open { border-color: var(--accent); border-radius: 10px 10px 0 0; }
+    .font-picker-trigger .chevron { transition: transform .2s; font-size: .7rem; }
+    .font-picker-trigger.open .chevron { transform: rotate(180deg); }
+    .font-picker-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+      background: #1e293b; border: 1px solid rgba(255,255,255,.15); border-top: none;
+      border-radius: 0 0 10px 10px; max-height: 260px; overflow-y: auto; display: none;
+    }
+    .font-picker-dropdown.open { display: block; }
+    .font-picker-search { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .font-picker-search input {
+      width: 100%; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px; padding: 7px 12px; color: var(--white); font-size: .85rem; outline: none;
+    }
+    .font-picker-search input::placeholder { color: rgba(255,255,255,.3); }
+    .font-option {
+      padding: 11px 16px; cursor: pointer; font-size: .9rem; color: rgba(255,255,255,.8);
+      transition: background .15s; display: flex; align-items: center; justify-content: space-between;
+    }
+    .font-option:hover { background: rgba(255,255,255,.06); }
+    .font-option.selected { color: var(--accent); background: rgba(14,165,233,.08); }
+    .font-option .font-preview { font-size: 1rem; color: rgba(255,255,255,.5); }
+
+    /* Color row (shared for text fill and stroke) */
+    .color-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .color-swatch {
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent; transition: border-color .2s, transform .15s;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.active { border-color: var(--accent); }
+
+    /* Stroke width slider */
+    .stroke-row { display: flex; align-items: center; gap: 14px; }
+    .stroke-row input[type="range"] {
+      flex: 1; accent-color: var(--accent);
+    }
+    .stroke-row .stroke-val { font-size: .8rem; color: rgba(255,255,255,.6); min-width: 28px; text-align: right; }
+
+    /* CTA */
+    .config-cta {
+      width: 100%; padding: 18px 24px;
+      font-size: 1rem; font-weight: 800;
+      background: var(--accent); color: var(--white);
+      border: none; border-radius: 50px; cursor: pointer;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 20px rgba(14,165,233,.35);
+    }
+    .config-cta:hover { background: var(--accent-dark); transform: translateY(-2px); }
+
+    /* ============================================================
+       STICKY BAR
+    ============================================================ */
+    #sticky-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+      background: var(--navy); padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      box-shadow: 0 -4px 24px rgba(15,23,42,.25);
+      transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    #sticky-bar.visible { transform: translateY(0); }
+    .sticky-product-info { display: flex; flex-direction: column; }
+    .sticky-name { font-size: .85rem; font-weight: 800; color: var(--white); }
+    .sticky-price { font-size: .8rem; color: rgba(255,255,255,.6); }
+    .sticky-btn {
+      flex-shrink: 0; background: var(--accent); color: var(--white);
+      font-size: .85rem; font-weight: 800; padding: 12px 28px; border-radius: 50px; border: none; cursor: pointer;
+      transition: background .2s;
+    }
+    .sticky-btn:hover { background: var(--accent-dark); }
+
+    /* ============================================================
+       FOOTER — Minimal CTA only
+    ============================================================ */
+    #footer { background: var(--navy); padding: 64px 0 40px; color: rgba(255,255,255,.6); }
+    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
+    .footer-brand { font-size: 1.4rem; font-weight: 900; letter-spacing: -.02em; color: var(--white); }
+    .footer-brand span { color: var(--accent); }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; font-size: .8rem; }
+    .footer-links a { color: rgba(255,255,255,.5); transition: color .2s; }
+    .footer-links a:hover { color: var(--white); }
+    .footer-copy { font-size: .75rem; color: rgba(255,255,255,.3); }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .pain-grid { grid-template-columns: 1fr; }
+      .buy-grid { grid-template-columns: 1fr; gap: 40px; }
+      .config-layout { grid-template-columns: 1fr; gap: 40px; }
+      .config-preview-wrap { position: static; }
+      .feature-row { grid-template-columns: 1fr; }
+      .feature-row.reverse { direction: ltr; }
+      .feature-img { aspect-ratio: 16/9; }
+      .feature-text { padding: 40px 32px; }
+    }
+    @media (max-width: 600px) {
+      #buy, #features, #configurator { padding: 64px 0; }
+      .feature-text { padding: 32px 24px; }
+      #sticky-bar { padding: 12px 16px; }
+      .gallery-thumb { width: 60px; height: 60px; }
+    }
+  </style>
+
+  <!-- Load Permanent Marker for watermark text -->
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ============================================================
+     SECTION 1: HERO
+============================================================ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">The Barnacle &mdash; Portable Beverage Holder</div>
+    <h1>Your drink's new<br><em>best friend.</em></h1>
+    <p class="hero-sub">
+      The portable, multi-use beverage holder that grips any flat surface — on the water, on the road, or wherever the day takes you.
+    </p>
+    <div class="hero-ctas">
+      <a href="#features" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Get Your Barnacle
+      </a>
+      <a href="#features" class="btn-outline">Learn More</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>&#8595;</span></div>
+</section>
+
+<!-- ============================================================
+     SECTION 2: WHY / FEATURES (before buy)
+============================================================ -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Tired of having nowhere to put your drink?</h2>
+      <p class="section-sub">Every flat surface is a cup holder now. The Barnacle sticks, grips, and holds — so you can stop worrying about your drink and start enjoying the moment.</p>
+    </div>
+
+    <!-- Pain point cards -->
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">🌊</div>
+        <h3>Boats have zero cup holders</h3>
+        <p>You're out on the water, waves are rolling, and your drink is sliding across the deck. The Barnacle fixes that permanently — no drilling, no installation.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🚗</div>
+        <h3>Flat surfaces everywhere, zero grip</h3>
+        <p>Truck dash, cooler lid, kayak deck, tailgate rail — none of them hold your drink. Until now. The Barnacle's suction base grips any smooth flat surface.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🥤</div>
+        <h3>Works with everything you drink from</h3>
+        <p>12 oz cans, 20 oz bottles, 30 oz tumblers, 40 oz Stanleys — the flexible silicone ring expands and contracts to hold virtually any drink securely.</p>
+      </div>
+    </div>
+
+    <!-- Feature rows: lifestyle photos -->
+    <div class="feature-row">
+      <div class="feature-img">
+        <img src="images/YETIFINALNOLOGO.webp" alt="Tumbler secured in The Barnacle on a pier over turquoise water" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="ft-eyebrow">On The Water</div>
+        <h3>Built for the dock, the boat, and the open water.</h3>
+        <p>Whether you're anchored in the bay or ripping through the wake, The Barnacle keeps your tumbler locked in place. UV-resistant, waterproof, and built to handle salt air and spray all day long.</p>
+        <div class="feat-pill">⚓ Boat-tested, water-approved</div>
+      </div>
+    </div>
+
+    <div class="feature-row reverse">
+      <div class="feature-img">
+        <img src="images/barnacle-truck-dash-wide.jpeg" alt="Two Barnacles on a truck dashboard holding drinks on the road" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="ft-eyebrow">On The Road</div>
+        <h3>Sticks to your dash. Stays all day.</h3>
+        <p>No cup holder? No problem. Flat dash, center console, cooler lid — if it's flat, The Barnacle owns it. Toss it anywhere and it grips like it was made for that spot. Heat-safe, cold-safe, and built to handle the bumps.</p>
+        <div class="feat-pill">🚛 Truck-tested, road-approved</div>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-img">
+        <img src="images/can-action-final.png" alt="Can secured in The Barnacle on a cooler near rapids" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="ft-eyebrow">Anywhere You Go</div>
+        <h3>Portable. Grippy. Zero excuses.</h3>
+        <p>Cooler lid, kayak deck, tailgate rail, campsite table — The Barnacle grips any flat surface. Weighs almost nothing. Fits in your pocket. Toss it in your bag and forget it's there until you need it most.</p>
+        <div class="feat-pill">🏕️ Trail-ready, tailgate-approved</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3: BUY / PRODUCT
+============================================================ -->
+<section id="buy">
+  <div class="container">
+    <div class="buy-grid">
+
+      <!-- LEFT: Gallery — lifestyle-first selection -->
+      <div class="product-gallery">
+        <div class="gallery-main">
+          <img id="mainImg" src="images/IMG_8877_1.webp" alt="Stanley tumbler held in The Barnacle" />
+        </div>
+        <div class="gallery-thumbs" id="galleryThumbs">
+          <div class="gallery-thumb active" data-src="images/IMG_8877_1.webp">
+            <img src="images/IMG_8877_1.webp" alt="Stanley tumbler held in The Barnacle" />
+          </div>
+          <div class="gallery-thumb" data-src="images/IMG_8874_1.webp">
+            <img src="images/IMG_8874_1.webp" alt="Can held in The Barnacle on wood disc" />
+          </div>
+          <div class="gallery-thumb" data-src="images/barnacle-truck-dash-close.jpeg">
+            <img src="images/barnacle-truck-dash-close.jpeg" alt="Barnacle on truck dashboard with can" />
+          </div>
+          <div class="gallery-thumb" data-src="images/YETIFINALNOLOGO.webp">
+            <img src="images/YETIFINALNOLOGO.webp" alt="Tumbler in Barnacle on pier over water" />
+          </div>
+          <div class="gallery-thumb" data-src="images/barnacle-color-options-2.jpg">
+            <img src="images/barnacle-color-options-2.jpg" alt="Pink floral ring variant" />
+          </div>
+          <div class="gallery-thumb" data-src="images/barnacle-new-1.jpg">
+            <img src="images/barnacle-new-1.jpg" alt="USA flag ring custom" />
+          </div>
+          <div class="gallery-thumb" data-src="images/barnacle-lifestyle-1.jpg">
+            <img src="images/barnacle-lifestyle-1.jpg" alt="Pink and black color options" />
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Conversion -->
+      <div class="product-info">
+        <div class="product-label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
+        <h2>The Barnacle</h2>
+        <p class="product-tagline">The portable beverage holder that grips any flat surface and holds any drink.</p>
+
+        <div class="price-block">
+          <span class="price">$29.99</span>
+          <span class="price-note">USD &bull; Free returns</span>
+        </div>
+
+        <ul class="features-list">
+          <li>
+            <div class="feat-icon">🔄</div>
+            <div><strong>Fits Virtually Any Drink</strong>12 oz cans to 40 oz Stanleys — the flexible ring adjusts to hold any drink.</div>
+          </li>
+          <li>
+            <div class="feat-icon">⚓</div>
+            <div><strong>Grips Any Flat Surface</strong>Boat deck, truck dash, cooler lid, kayak — if it's flat, The Barnacle holds.</div>
+          </li>
+          <li>
+            <div class="feat-icon">🌡️</div>
+            <div><strong>UV-Resistant &amp; Waterproof</strong>Built for the outdoors — won't warp in the sun or crack in the cold.</div>
+          </li>
+          <li>
+            <div class="feat-icon">🎨</div>
+            <div><strong>Fully Customizable</strong>Pick your base color, upload any pattern, and add your own text below.</div>
+          </li>
+        </ul>
+
+        <div id="shopify-form-wrapper">
+          <form id="productForm" onsubmit="handleAddToCart(event)">
+            <button type="submit" class="add-to-cart-btn" id="addToCartBtn">
+              Add to Cart &mdash; $29.99
+            </button>
+          </form>
+        </div>
+
+        <!-- Customize upsell bridge -->
+        <div style="margin-top:16px;border:1.5px dashed rgba(14,165,233,.4);border-radius:14px;padding:16px 20px;background:rgba(14,165,233,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:.82rem;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Want it personalized?</div>
+            <div style="font-size:.9rem;color:rgba(255,255,255,.7);">Add custom text, colors &amp; patterns — only <strong style="color:#fff;">+$10</strong></div>
+          </div>
+          <a href="#configurator" class="btn-primary" style="font-size:.88rem;padding:12px 22px;white-space:nowrap;">Customize It &rarr;</a>
+        </div>
+
+        <div class="trust-row">
+          <span>🔒 Secure Checkout</span>
+          <span>🚚 Free Shipping</span>
+          <span>↩️ Easy Returns</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 4: MAKE IT YOURS — LIVE CONFIGURATOR
+============================================================ -->
+<section id="configurator">
+  <div class="container">
+    <div class="section-header">
+      <h2>Make It Yours.</h2>
+      <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.35);border-radius:50px;padding:8px 20px;margin-bottom:8px;">
+        <span style="font-size:.85rem;color:rgba(255,255,255,.6);">Base price $29.99</span>
+        <span style="color:rgba(255,255,255,.3);">+</span>
+        <span style="font-size:.95rem;font-weight:700;color:var(--accent);">$10 customization</span>
+        <span style="font-size:.95rem;font-weight:800;color:#fff;">=&nbsp;$39.99 total</span>
+      </div>
+      <p class="section-sub">Choose your base color, upload a pattern or image, and add your custom text — see it live before you buy.</p>
+    </div>
+
+    <div class="config-layout">
+
+      <!-- Live Preview -->
+      <div class="config-preview-wrap">
+        <div class="config-preview-label">Live Preview</div>
+        <div class="config-canvas-container">
+          <canvas id="previewCanvas" width="600" height="600"></canvas>
+          <div class="preview-badge">Live Preview Active</div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="config-controls">
+
+        <!-- Step 1: Base Color -->
+        <div class="config-group">
+          <div class="config-group-title">Step 1 &mdash; Choose Your Base Color</div>
+          <div class="base-swatches">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="base-swatch active" data-color="white" onclick="setBaseColor('white',this)" title="White"></div>
+              <span class="swatch-label">White</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="base-swatch" data-color="black" onclick="setBaseColor('black',this)" title="Matte Black"></div>
+              <span class="swatch-label">Black</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="base-swatch" data-color="pink" onclick="setBaseColor('pink',this)" title="Pink"></div>
+              <span class="swatch-label">Pink</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Ring Pattern -->
+        <div class="config-group">
+          <div class="config-group-title">Step 2 &mdash; Customize the Ring</div>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="patternUpload" accept="image/*" onchange="handlePatternUpload(event)" />
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-title">Upload Your Image or Pattern</div>
+            <div class="upload-sub">JPG, PNG, or SVG &bull; Any size works</div>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Or pick a preset</div>
+            <div class="preset-patterns" id="presetPatterns">
+              <button class="preset-btn active" onclick="setPreset('none',this)">Plain</button>
+              <button class="preset-btn" onclick="setPreset('camo',this)">🌿 Camo</button>
+              <button class="preset-btn" onclick="setPreset('usa',this)">🇺🇸 USA Flag</button>
+              <button class="preset-btn" onclick="setPreset('floral',this)">🌸 Floral</button>
+            </div>
+          </div>
+          <div class="upload-preview-strip" id="uploadStrip"></div>
+        </div>
+
+        <!-- Step 3: Custom Text -->
+        <div class="config-group">
+          <div class="config-group-title">Step 3 &mdash; Add Your Text</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <input
+              type="text"
+              class="config-input"
+              id="customText"
+              placeholder="e.g. The Crew, Lake Life, Mr. Lund..."
+              maxlength="24"
+              oninput="renderPreview()"
+            />
+
+            <!-- Font Picker -->
+            <div class="font-picker-wrap">
+              <div class="font-picker-trigger" id="fontTrigger" onclick="toggleFontPicker()">
+                <span id="fontTriggerLabel" style="font-family:'Inter',sans-serif;">Inter (Default)</span>
+                <span class="chevron">▼</span>
+              </div>
+              <div class="font-picker-dropdown" id="fontDropdown">
+                <div class="font-picker-search">
+                  <input type="text" placeholder="Search fonts..." id="fontSearch" oninput="filterFonts()" />
+                </div>
+                <div id="fontList"></div>
+              </div>
+            </div>
+
+            <!-- Text Fill Color — RGB Picker -->
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Color</div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <input type="color" id="textColorPicker" value="#0f172a"
+                  oninput="currentTextColor=this.value;renderPreview()"
+                  style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;" />
+                <span style="font-size:.82rem;color:rgba(255,255,255,.5);">Pick any color</span>
+              </div>
+            </div>
+
+            <!-- Text Stroke / Border Color — RGB Picker -->
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Stroke / Border Color</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                  <input type="checkbox" id="strokeToggle" onchange="toggleStroke(this.checked)"
+                    style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;" />
+                  <span style="font-size:.85rem;color:rgba(255,255,255,.6);">Add stroke</span>
+                </label>
+                <input type="color" id="strokeColorPicker" value="#ffffff"
+                  oninput="currentStrokeColor=this.value;renderPreview()"
+                  style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;display:none;" />
+              </div>
+              <div class="stroke-row" id="strokeWidthRow" style="margin-top:12px;display:none;">
+                <span style="font-size:.78rem;color:rgba(255,255,255,.5);">Width</span>
+                <input type="range" id="strokeWidth" min="1" max="8" value="2" oninput="updateStrokeWidth(this.value)" />
+                <span class="stroke-val" id="strokeWidthVal">2px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <button class="config-cta" onclick="addCustomToCart()">
+          Add Custom Barnacle to Cart &mdash; $39.99
+        </button>
+        <p style="font-size:.75rem;color:rgba(255,255,255,.35);text-align:center;margin-top:-16px;">
+          +$10 customization fee &bull; Your details are saved with your order.
+        </p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STICKY ADD TO CART BAR
+============================================================ -->
+<div id="sticky-bar">
+  <div class="sticky-product-info">
+    <span class="sticky-name">The Barnacle</span>
+    <span class="sticky-price">$29.99 &bull; Free Shipping</span>
+  </div>
+  <button class="sticky-btn" onclick="document.getElementById('productForm').dispatchEvent(new Event('submit'))">
+    Add to Cart
+  </button>
+</div>
+
+<!-- ============================================================
+     MINIMAL FOOTER CTA
+============================================================ -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">The <span>Barnacle</span></div>
+      <a href="#buy" class="btn-primary" style="font-size:1.05rem;padding:18px 48px;">Get Your Barnacle</a>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Shipping &amp; Returns</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-copy">&copy; 2025 The Beverage Barnacle Co. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+/* ================================================================
+   GALLERY
+================================================================ */
+const thumbEls = document.querySelectorAll('.gallery-thumb');
+const mainImg  = document.getElementById('mainImg');
+mainImg.style.transition = 'opacity .18s';
+thumbEls.forEach(t => {
+  t.addEventListener('click', () => {
+    thumbEls.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    mainImg.style.opacity = '0';
+    setTimeout(() => { mainImg.src = t.dataset.src; mainImg.style.opacity = '1'; }, 180);
+  });
+});
+
+/* ================================================================
+   STICKY BAR
+================================================================ */
+const buySection = document.getElementById('buy');
+const stickyBar  = document.getElementById('sticky-bar');
+new IntersectionObserver(([e]) => stickyBar.classList.toggle('visible', !e.isIntersecting), { threshold: 0.1 })
+  .observe(buySection);
+
+/* ================================================================
+   ADD TO CART (demo — wire to Shopify fetch('/cart/add.js') in production)
+================================================================ */
+function handleAddToCart(e) {
+  e.preventDefault();
+  const btn = document.getElementById('addToCartBtn');
+  btn.textContent = '✓ Added to Cart!';
+  btn.style.background = '#16a34a';
+  setTimeout(() => { btn.textContent = 'Add to Cart — $29.99'; btn.style.background = ''; }, 2200);
+}
+function addCustomToCart() {
+  const text        = document.getElementById('customText').value;
+  const font        = currentFont;
+  const baseColor   = currentBaseColor;
+  const strokeColor = currentStrokeColor;
+  const strokeWidth = document.getElementById('strokeWidth').value;
+  // In Shopify: attach as line item properties via fetch('/cart/add.js', { properties: {...} })
+  console.log('Custom order:', { baseColor, font, text, ringPattern: currentPattern, strokeColor, strokeWidth });
+  const btn = document.querySelector('.config-cta');
+  btn.textContent = '✓ Added! Check your cart.';
+  btn.style.background = '#16a34a';
+  setTimeout(() => { btn.textContent = 'Add Custom Barnacle to Cart — $39.99'; btn.style.background = ''; }, 2500);
+}
+function handleEmailSignup(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.textContent = "✓ You're in!"; btn.style.background = '#16a34a';
+}
+
+/* ================================================================
+   CONFIGURATOR STATE
+================================================================ */
+let currentBaseColor   = 'white';
+let currentFont        = 'Inter';
+let currentTextColor   = '#0f172a';
+let currentStrokeColor = 'none';
+let currentPattern     = 'none';
+let uploadedImageObj   = null;
+let presetImageObj     = null;
+
+/* ================================================================
+   GOOGLE FONTS LIST
+================================================================ */
+const FONTS = [
+  { name: 'Inter',            category: 'Sans-Serif' },
+  { name: 'Roboto',           category: 'Sans-Serif' },
+  { name: 'Oswald',           category: 'Display' },
+  { name: 'Bebas Neue',       category: 'Display' },
+  { name: 'Anton',            category: 'Display' },
+  { name: 'Bangers',          category: 'Display' },
+  { name: 'Permanent Marker', category: 'Handwriting' },
+  { name: 'Pacifico',         category: 'Handwriting' },
+  { name: 'Lobster',          category: 'Handwriting' },
+  { name: 'Dancing Script',   category: 'Handwriting' },
+  { name: 'Satisfy',          category: 'Handwriting' },
+  { name: 'Righteous',        category: 'Display' },
+  { name: 'Fredoka One',      category: 'Display' },
+  { name: 'Russo One',        category: 'Display' },
+  { name: 'Black Han Sans',   category: 'Sans-Serif' },
+  { name: 'Alfa Slab One',    category: 'Serif' },
+  { name: 'Playfair Display', category: 'Serif' },
+  { name: 'Merriweather',     category: 'Serif' },
+  { name: 'Lato',             category: 'Sans-Serif' },
+  { name: 'Montserrat',       category: 'Sans-Serif' },
+  { name: 'Raleway',          category: 'Sans-Serif' },
+  { name: 'Exo 2',            category: 'Sans-Serif' },
+  { name: 'Orbitron',         category: 'Display' },
+  { name: 'Cinzel',           category: 'Serif' },
+  { name: 'Abril Fatface',    category: 'Display' },
+  { name: 'Titan One',        category: 'Display' },
+  { name: 'Lilita One',       category: 'Display' },
+  { name: 'Boogaloo',         category: 'Display' },
+  { name: 'Chewy',            category: 'Display' },
+  { name: 'Kalam',            category: 'Handwriting' },
+];
+let loadedFonts    = new Set(['Inter', 'Permanent Marker']);
+let filteredFonts  = [...FONTS];
+
+function buildFontList() {
+  const list = document.getElementById('fontList');
+  list.innerHTML = '';
+  filteredFonts.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'font-option' + (f.name === currentFont ? ' selected' : '');
+    div.innerHTML = `<span>${f.name} <small style="opacity:.4;font-size:.75em;">${f.category}</small></span><span class="font-preview" style="font-family:'${f.name}',sans-serif;">Aa</span>`;
+    div.addEventListener('click', () => selectFont(f.name));
+    list.appendChild(div);
+  });
+}
+function filterFonts() {
+  const q = document.getElementById('fontSearch').value.toLowerCase();
+  filteredFonts = FONTS.filter(f => f.name.toLowerCase().includes(q) || f.category.toLowerCase().includes(q));
+  buildFontList();
+}
+function toggleFontPicker() {
+  const trigger   = document.getElementById('fontTrigger');
+  const dropdown  = document.getElementById('fontDropdown');
+  const isOpen    = dropdown.classList.contains('open');
+  trigger.classList.toggle('open', !isOpen);
+  dropdown.classList.toggle('open', !isOpen);
+  if (!isOpen) { buildFontList(); document.getElementById('fontSearch').focus(); }
+}
+function selectFont(name) {
+  currentFont = name;
+  document.getElementById('fontTriggerLabel').textContent = name;
+  document.getElementById('fontTriggerLabel').style.fontFamily = `'${name}', sans-serif`;
+  document.getElementById('fontTrigger').classList.remove('open');
+  document.getElementById('fontDropdown').classList.remove('open');
+  if (!loadedFonts.has(name)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@400;700&display=swap`;
+    document.head.appendChild(link);
+    loadedFonts.add(name);
+    setTimeout(renderPreview, 450);
+  } else { renderPreview(); }
+  buildFontList();
+}
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.font-picker-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('fontTrigger').classList.remove('open');
+    document.getElementById('fontDropdown').classList.remove('open');
+  }
+});
+
+/* ================================================================
+   BASE COLOR
+================================================================ */
+function setBaseColor(color, el) {
+  currentBaseColor = color;
+  document.querySelectorAll('.base-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  renderPreview();
+}
+
+/* ================================================================
+   TEXT COLOR (RGB picker)
+================================================================ */
+function setTextColor(color) {
+  currentTextColor = color;
+  renderPreview();
+}
+
+/* ================================================================
+   STROKE COLOR (RGB picker + toggle)
+================================================================ */
+function toggleStroke(enabled) {
+  const picker   = document.getElementById('strokeColorPicker');
+  const widthRow = document.getElementById('strokeWidthRow');
+  if (enabled) {
+    currentStrokeColor = document.getElementById('strokeColorPicker').value;
+    picker.style.display   = 'block';
+    widthRow.style.display = 'flex';
+  } else {
+    currentStrokeColor = 'none';
+    picker.style.display   = 'none';
+    widthRow.style.display = 'none';
+  }
+  renderPreview();
+}
+function setStrokeColor(color, el) {
+  currentStrokeColor = color;
+  renderPreview();
+}
+function updateStrokeWidth(val) {
+  document.getElementById('strokeWidthVal').textContent = val + 'px';
+  renderPreview();
+}
+
+/* ================================================================
+   PRESET PATTERNS
+================================================================ */
+const PRESET_IMAGES = {
+  camo:   'images/preset-camo.jpg',
+  usa:    'images/preset-usa-flag.jpg',
+  floral: 'images/preset-floral.jpg',
+};
+function setPreset(name, el) {
+  currentPattern = name;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  uploadedImageObj = null;
+  if (name === 'none') { presetImageObj = null; renderPreview(); }
+  else {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { presetImageObj = img; renderPreview(); };
+    img.src = PRESET_IMAGES[name];
+  }
+}
+
+/* ================================================================
+   IMAGE UPLOAD
+================================================================ */
+function handlePatternUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedImageObj = img; presetImageObj = null; currentPattern = 'uploaded';
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      const strip = document.getElementById('uploadStrip');
+      const thumb = document.createElement('div');
+      thumb.className = 'upload-thumb active';
+      thumb.innerHTML = `<img src="${ev.target.result}" alt="uploaded" />`;
+      strip.innerHTML = ''; strip.appendChild(thumb);
+      renderPreview();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById('patternUpload').files = dt.files;
+    handlePatternUpload({ target: { files: dt.files } });
+  }
+});
+
+/* ================================================================
+   CANVAS RENDERER
+   Draws a realistic top-down view of The Barnacle:
+   - Wood grain background (matches the product photo backdrop)
+   - Outer ring (customizable pattern or color)
+   - Inner silicone cup (base color with 3D shading)
+   - Curved text on the ring with optional stroke
+================================================================ */
+const canvas = document.getElementById('previewCanvas');
+const ctx    = canvas.getContext('2d');
+const CX = 300, CY = 300;
+const R_OUTER = 268;   // outer ring radius
+const R_INNER = 168;   // inner cup radius
+const R_CUP   = 96;    // cup opening
+
+// Load wood background for canvas
+const woodBg = new Image();
+woodBg.crossOrigin = 'anonymous';
+woodBg.onload = renderPreview;
+woodBg.src = 'images/barnacle-topdown-wood-clean-nodrink.jpg';
+
+function renderPreview() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // ---- WOOD BACKGROUND ----
+  if (woodBg.complete && woodBg.naturalWidth > 0) {
+    ctx.save();
+    ctx.drawImage(woodBg, 0, 0, W, H);
+    // Slight darken vignette on background
+    const bgVig = ctx.createRadialGradient(CX, CY, R_OUTER * 0.8, CX, CY, W * 0.8);
+    bgVig.addColorStop(0, 'rgba(0,0,0,0)');
+    bgVig.addColorStop(1, 'rgba(0,0,0,.45)');
+    ctx.fillStyle = bgVig;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = '#c8a96e';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // ---- RING SHADOW (depth) ----
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.55)';
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 6;
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  ctx.restore();
+
+  // ---- OUTER RING ----
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+
+  const patternSrc = uploadedImageObj || presetImageObj;
+  if (patternSrc) {
+    const s = R_OUTER * 2;
+    ctx.drawImage(patternSrc, CX - R_OUTER, CY - R_OUTER, s, s);
+  } else {
+    // Plain ring — white/light gray disc
+    ctx.fillStyle = '#e8e8e8';
+    ctx.fill();
+    // Subtle ring texture
+    const ringGrad = ctx.createRadialGradient(CX - 40, CY - 40, 20, CX, CY, R_OUTER);
+    ringGrad.addColorStop(0, 'rgba(255,255,255,.3)');
+    ringGrad.addColorStop(1, 'rgba(0,0,0,.08)');
+    ctx.fillStyle = ringGrad;
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Ring edge highlight
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,.25)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // ---- SILICONE CUP (base color) ----
+  const baseColors = {
+    white: { fill: '#f2f2f2', highlight: '#ffffff', shadow: '#c0c0c0', rim: '#d8d8d8', mid: '#e8e8e8' },
+    black: { fill: '#1c1c1c', highlight: '#3c3c3c', shadow: '#080808', rim: '#282828', mid: '#242424' },
+    pink:  { fill: '#ec4899', highlight: '#f472b6', shadow: '#be185d', rim: '#db2777', mid: '#e879a8' },
+  };
+  const bc = baseColors[currentBaseColor] || baseColors.white;
+
+  // Cup body shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.4)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 4;
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_INNER, 0, Math.PI * 2);
+  ctx.fillStyle = bc.fill;
+  ctx.fill();
+  ctx.restore();
+
+  // Cup body gradient (3D dome look)
+  const cupGrad = ctx.createRadialGradient(CX - 45, CY - 45, 8, CX, CY, R_INNER);
+  cupGrad.addColorStop(0,   bc.highlight);
+  cupGrad.addColorStop(0.35, bc.mid);
+  cupGrad.addColorStop(0.75, bc.fill);
+  cupGrad.addColorStop(1,   bc.shadow);
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_INNER, 0, Math.PI * 2);
+  ctx.fillStyle = cupGrad;
+  ctx.fill();
+
+  // Cup rim
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_INNER, 0, Math.PI * 2);
+  ctx.strokeStyle = bc.rim;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // ---- CUP OPENING — matches base color, darker inner ----
+  const holeColors = {
+    white: { outer: '#c8c8c8', inner: '#909090' },
+    black: { outer: '#111111', inner: '#050505' },
+    pink:  { outer: '#be185d', inner: '#881337' },
+  };
+  const hc = holeColors[currentBaseColor] || holeColors.white;
+  const holeGrad = ctx.createRadialGradient(CX - 12, CY - 12, 4, CX, CY, R_CUP);
+  holeGrad.addColorStop(0, hc.outer);
+  holeGrad.addColorStop(0.5, hc.inner);
+  holeGrad.addColorStop(1, hc.inner);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.6)';
+  ctx.shadowBlur = 18;
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_CUP, 0, Math.PI * 2);
+  ctx.fillStyle = holeGrad;
+  ctx.fill();
+  ctx.restore();
+
+  // Inner rim highlight
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_CUP, 0, Math.PI * 2);
+  ctx.strokeStyle = bc.rim;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // ---- CURVED TEXT ON RING ----
+  const text = document.getElementById('customText').value.trim();
+  if (text) {
+    const textRadius = (R_OUTER + R_INNER) / 2 + 6;
+    const fontSize   = Math.min(38, Math.max(16, Math.floor(230 / text.length)));
+    const strokeW    = parseInt(document.getElementById('strokeWidth').value) || 2;
+
+    ctx.save();
+    ctx.font = `700 ${fontSize}px '${currentFont}', sans-serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+
+    const totalAngle = Math.min(Math.PI * 1.3, (text.length * fontSize * 0.62) / textRadius);
+    const startAngle = -Math.PI / 2 - totalAngle / 2;
+
+    for (let i = 0; i < text.length; i++) {
+      const charAngle = startAngle + (i + 0.5) * (totalAngle / text.length);
+      ctx.save();
+      ctx.translate(
+        CX + textRadius * Math.cos(charAngle),
+        CY + textRadius * Math.sin(charAngle)
+      );
+      ctx.rotate(charAngle + Math.PI / 2);
+
+      // Stroke (border) pass first
+      if (currentStrokeColor !== 'none') {
+        ctx.strokeStyle = currentStrokeColor;
+        ctx.lineWidth   = strokeW * 2;
+        ctx.lineJoin    = 'round';
+        ctx.strokeText(text[i], 0, 0);
+      }
+
+      // Fill pass
+      ctx.fillStyle = currentTextColor;
+      ctx.fillText(text[i], 0, 0);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  // ---- SUBTLE VIGNETTE ON RING EDGES ----
+  const vignette = ctx.createRadialGradient(CX, CY, R_INNER * 0.5, CX, CY, R_OUTER * 1.05);
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(0.7, 'rgba(0,0,0,0)');
+  vignette.addColorStop(1, 'rgba(0,0,0,.22)');
+  ctx.beginPath();
+  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
+  ctx.fillStyle = vignette;
+  ctx.fill();
+}
+
+// Initial render
+renderPreview();
+document.fonts.ready.then(renderPreview);
+</script>
+
+</body>
+</html>

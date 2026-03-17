@@ -1,0 +1,556 @@
+{% comment %}
+  ============================================================
+  THE BARNACLE — Shopify Liquid Landing Page Section
+  Compatible with: Dawn theme + Optus product customizer
+  
+  HOW TO USE:
+  1. In Shopify Admin → Online Store → Themes → Dawn → Edit Code
+  2. Under "Sections", click "Add a new section" → name it "barnacle-landing"
+  3. Paste this entire file content
+  4. In your page template (or home page), add:
+       {% section 'barnacle-landing' %}
+  5. Optus automatically injects its customizer UI into the product form
+     because this section uses the standard Shopify product form structure.
+  
+  OPTUS LIVE PREVIEW:
+  - Optus detects the product form via the standard `form 'product'` tag
+  - The #optus-customizer div is where Optus injects its option UI
+  - Live preview works because the product form follows Shopify's standard
+    variant selection pattern that Optus hooks into
+  - No custom JS needed — Optus handles everything via its app embed
+  
+  SCHEMA at bottom allows customization in the Theme Editor.
+  ============================================================
+{% endcomment %}
+
+{%- assign current_product = section.settings.product | default: product -%}
+{%- assign current_variant = current_product.selected_or_first_available_variant -%}
+
+<style>
+  /* Scoped to this section to avoid conflicts with Dawn base styles */
+  .barnacle-section * { box-sizing: border-box; }
+
+  /* ---- HERO ---- */
+  .barnacle-hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .barnacle-hero__bg {
+    position: absolute; inset: 0;
+    background-image: url('{{ section.settings.hero_image | image_url: width: 2000 }}');
+    background-size: cover; background-position: center 30%;
+  }
+  .barnacle-hero__overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(15,23,42,.45) 0%, rgba(15,23,42,.55) 60%, rgba(15,23,42,.75) 100%);
+  }
+  .barnacle-hero__content {
+    position: relative; z-index: 2;
+    text-align: center; padding: 80px 24px 120px;
+    max-width: 820px; margin: 0 auto;
+  }
+  .barnacle-hero__eyebrow {
+    display: inline-block;
+    font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: #0ea5e9;
+    background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.4);
+    padding: 6px 16px; border-radius: 50px;
+    margin-bottom: 28px;
+  }
+  .barnacle-hero__title {
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 900; line-height: 1.08; letter-spacing: -.02em;
+    color: #fff; margin-bottom: 24px;
+  }
+  .barnacle-hero__title em { font-style: normal; color: #0ea5e9; }
+  .barnacle-hero__sub {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    color: rgba(255,255,255,.82); line-height: 1.65;
+    max-width: 560px; margin: 0 auto 44px;
+  }
+  .barnacle-hero__ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .barnacle-btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: #0ea5e9; color: #fff;
+    font-size: 1rem; font-weight: 700;
+    padding: 16px 36px; border-radius: 50px; border: none; cursor: pointer;
+    transition: background .2s, transform .15s;
+    box-shadow: 0 4px 20px rgba(14,165,233,.35);
+    text-decoration: none;
+  }
+  .barnacle-btn-primary:hover { background: #0284c7; transform: translateY(-2px); }
+  .barnacle-btn-outline {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; color: #fff;
+    font-size: 1rem; font-weight: 700;
+    padding: 14px 32px; border-radius: 50px;
+    border: 2px solid rgba(255,255,255,.6); cursor: pointer;
+    transition: background .2s; text-decoration: none;
+  }
+  .barnacle-btn-outline:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+
+  /* ---- BUY SECTION ---- */
+  .barnacle-buy { padding: 96px 0; background: #fff; }
+  .barnacle-buy__grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+  }
+  .barnacle-gallery__main {
+    border-radius: 12px; overflow: hidden; aspect-ratio: 1/1;
+    background: #f8fafc; cursor: zoom-in;
+  }
+  .barnacle-gallery__main img { width: 100%; height: 100%; object-fit: cover; transition: opacity .18s; }
+  .barnacle-gallery__thumbs { display: flex; gap: 10px; margin-top: 12px; }
+  .barnacle-gallery__thumb {
+    width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+    border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: #f8fafc;
+    transition: border-color .2s;
+  }
+  .barnacle-gallery__thumb.active, .barnacle-gallery__thumb:hover { border-color: #0ea5e9; }
+  .barnacle-gallery__thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .barnacle-product__label {
+    font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: #0ea5e9; margin-bottom: 10px;
+  }
+  .barnacle-product__title {
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 900; letter-spacing: -.03em; color: #0f172a; margin-bottom: 16px;
+  }
+  .barnacle-product__tagline { font-size: 1.05rem; color: #475569; line-height: 1.6; margin-bottom: 28px; }
+  .barnacle-price-block { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
+  .barnacle-price { font-size: 2.2rem; font-weight: 900; color: #0f172a; }
+  .barnacle-price-note { font-size: .85rem; color: #475569; }
+
+  /* Optus customizer wrapper */
+  .barnacle-customizer {
+    background: #f8fafc; border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 28px;
+    border: 1px solid #e2e8f0;
+  }
+  .barnacle-customizer__label {
+    font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: #475569; margin-bottom: 14px;
+  }
+  /* Optus injects inside #barnacle-optus-mount */
+  #barnacle-optus-mount { min-height: 60px; }
+  .barnacle-live-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .72rem; font-weight: 600; color: #16a34a;
+    background: #dcfce7; border-radius: 50px; padding: 4px 12px; margin-top: 10px;
+  }
+  .barnacle-live-badge::before { content: '●'; font-size: .6rem; }
+
+  .barnacle-features { list-style: none; margin-bottom: 36px; display: flex; flex-direction: column; gap: 14px; }
+  .barnacle-features li { display: flex; align-items: flex-start; gap: 12px; font-size: .95rem; color: #1e293b; line-height: 1.5; }
+  .barnacle-feat-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: rgba(14,165,233,.1); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+  .barnacle-features strong { display: block; font-weight: 700; color: #0f172a; }
+
+  /* Shopify product form — Optus hooks into this standard form */
+  .barnacle-product-form { display: flex; flex-direction: column; gap: 12px; }
+  .barnacle-atc-btn {
+    width: 100%; padding: 18px 24px;
+    font-size: 1.05rem; font-weight: 800;
+    background: #0f172a; color: #fff;
+    border: none; border-radius: 50px; cursor: pointer;
+    transition: background .2s, transform .15s;
+    box-shadow: 0 4px 20px rgba(15,23,42,.25);
+  }
+  .barnacle-atc-btn:hover { background: #1e293b; transform: translateY(-2px); }
+  .barnacle-trust { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-size: .78rem; color: #475569; margin-top: 4px; }
+  .barnacle-trust span { display: flex; align-items: center; gap: 5px; }
+
+  /* ---- FEATURE GRID ---- */
+  .barnacle-features-section { padding: 96px 0; background: #f8fafc; }
+  .barnacle-features-section .inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .barnacle-section-header { text-align: center; margin-bottom: 72px; }
+  .barnacle-section-eyebrow {
+    font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: #0ea5e9; margin-bottom: 14px;
+  }
+  .barnacle-section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900; letter-spacing: -.025em; color: #0f172a;
+    max-width: 600px; margin: 0 auto;
+  }
+  .barnacle-feature-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    overflow: hidden; border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(15,23,42,.12);
+    margin-bottom: 40px;
+  }
+  .barnacle-feature-row.reverse { direction: rtl; }
+  .barnacle-feature-row.reverse > * { direction: ltr; }
+  .barnacle-feature-img { aspect-ratio: 4/5; overflow: hidden; }
+  .barnacle-feature-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+  .barnacle-feature-img:hover img { transform: scale(1.04); }
+  .barnacle-feature-text {
+    background: #fff; display: flex; flex-direction: column; justify-content: center;
+    padding: 56px 52px;
+  }
+  .barnacle-ft-eyebrow {
+    font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: #0ea5e9; margin-bottom: 16px;
+  }
+  .barnacle-ft-title {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 900; letter-spacing: -.02em; color: #0f172a;
+    line-height: 1.15; margin-bottom: 18px;
+  }
+  .barnacle-ft-body { font-size: 1rem; color: #475569; line-height: 1.7; }
+  .barnacle-feat-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .78rem; font-weight: 700; color: #0f172a;
+    background: #f8fafc; border-radius: 50px; padding: 6px 14px; margin-top: 24px; align-self: flex-start;
+  }
+
+  /* ---- STICKY BAR ---- */
+  .barnacle-sticky {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+    background: #0f172a; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    box-shadow: 0 -4px 24px rgba(15,23,42,.25);
+    transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+  }
+  .barnacle-sticky.visible { transform: translateY(0); }
+  .barnacle-sticky__name { font-size: .85rem; font-weight: 800; color: #fff; }
+  .barnacle-sticky__price { font-size: .8rem; color: rgba(255,255,255,.6); }
+  .barnacle-sticky__btn {
+    flex-shrink: 0; background: #0ea5e9; color: #fff;
+    font-size: .85rem; font-weight: 800;
+    padding: 12px 28px; border-radius: 50px; border: none; cursor: pointer;
+    transition: background .2s;
+  }
+  .barnacle-sticky__btn:hover { background: #0284c7; }
+
+  /* ---- FOOTER ---- */
+  .barnacle-footer { background: #0f172a; padding: 64px 0 32px; color: rgba(255,255,255,.6); }
+  .barnacle-footer__inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 40px; text-align: center;
+  }
+  .barnacle-footer__brand { font-size: 1.4rem; font-weight: 900; color: #fff; }
+  .barnacle-footer__brand span { color: #0ea5e9; }
+  .barnacle-footer__email { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .barnacle-footer__email input {
+    padding: 12px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.08); color: #fff; font-size: .9rem; min-width: 260px; outline: none;
+  }
+  .barnacle-footer__email input::placeholder { color: rgba(255,255,255,.4); }
+  .barnacle-footer__email button {
+    padding: 12px 28px; border-radius: 50px; border: none;
+    background: #0ea5e9; color: #fff; font-size: .9rem; font-weight: 700; cursor: pointer;
+  }
+  .barnacle-footer__links { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; font-size: .8rem; }
+  .barnacle-footer__links a { color: rgba(255,255,255,.5); text-decoration: none; }
+  .barnacle-footer__links a:hover { color: #fff; }
+  .barnacle-footer__copy { font-size: .75rem; color: rgba(255,255,255,.3); }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 900px) {
+    .barnacle-buy__grid { grid-template-columns: 1fr; gap: 40px; }
+    .barnacle-feature-row { grid-template-columns: 1fr; }
+    .barnacle-feature-row.reverse { direction: ltr; }
+    .barnacle-feature-img { aspect-ratio: 16/9; }
+    .barnacle-feature-text { padding: 40px 32px; }
+  }
+  @media (max-width: 600px) {
+    .barnacle-buy { padding: 64px 0; }
+    .barnacle-features-section { padding: 64px 0; }
+    .barnacle-feature-text { padding: 32px 24px; }
+    .barnacle-sticky { padding: 12px 16px; }
+  }
+</style>
+
+<!-- HERO -->
+<section class="barnacle-hero" id="barnacle-hero">
+  <div class="barnacle-hero__bg"></div>
+  <div class="barnacle-hero__overlay"></div>
+  <div class="barnacle-hero__content">
+    <div class="barnacle-hero__eyebrow">The Barnacle &mdash; Portable Beverage Holder</div>
+    <h1 class="barnacle-hero__title">
+      {{ section.settings.hero_headline | default: 'Built for boats, <em>perfected</em> for everywhere else.' }}
+    </h1>
+    <p class="barnacle-hero__sub">
+      {{ section.settings.hero_subheadline | default: 'The portable, multi-use beverage holder designed to fit cans and cups of all sizes. Secure your drink on the water, on the trail, or on the tailgate.' }}
+    </p>
+    <div class="barnacle-hero__ctas">
+      <a href="#barnacle-buy" class="barnacle-btn-primary">Get Your Barnacle</a>
+      <a href="#barnacle-features" class="barnacle-btn-outline">See It In Action</a>
+    </div>
+  </div>
+</section>
+
+<!-- BUY / PRODUCT SECTION -->
+<section class="barnacle-buy" id="barnacle-buy">
+  <div class="barnacle-buy__grid">
+
+    <!-- Gallery -->
+    <div class="barnacle-gallery">
+      <div class="barnacle-gallery__main">
+        <img id="barnacle-main-img"
+          src="{{ current_product.featured_image | image_url: width: 800 }}"
+          alt="{{ current_product.featured_image.alt | escape }}" />
+      </div>
+      <div class="barnacle-gallery__thumbs" id="barnacle-thumbs">
+        {%- for image in current_product.images limit: 5 -%}
+        <div class="barnacle-gallery__thumb{% if forloop.first %} active{% endif %}"
+          data-src="{{ image | image_url: width: 800 }}">
+          <img src="{{ image | image_url: width: 150 }}" alt="{{ image.alt | escape }}" />
+        </div>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <!-- Conversion Column -->
+    <div class="barnacle-product-info">
+      <div class="barnacle-product__label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
+      <h2 class="barnacle-product__title">{{ current_product.title }}</h2>
+      <p class="barnacle-product__tagline">{{ section.settings.product_tagline | default: "Your drink's new best friend — on the water, on the road, or at the tailgate." }}</p>
+
+      <div class="barnacle-price-block">
+        <span class="barnacle-price">{{ current_variant.price | money }}</span>
+        <span class="barnacle-price-note">USD &bull; Free returns</span>
+      </div>
+
+      <!-- Optus Customizer Mount -->
+      <!-- Optus automatically detects the product form below and injects its UI here -->
+      <div class="barnacle-customizer">
+        <div class="barnacle-customizer__label">Customize Your Barnacle</div>
+        <div id="barnacle-optus-mount">
+          {%- comment -%}
+            Optus injects its customizer UI into this div automatically.
+            No additional code needed — Optus hooks into the product form below.
+            If using Optus "Custom Fields" app, ensure the product form has
+            the standard Shopify structure (which it does below).
+          {%- endcomment -%}
+          {{ current_product.metafields.optus.customizer_html }}
+        </div>
+        <div class="barnacle-live-badge">Live Preview Active</div>
+      </div>
+
+      <!-- Feature Bullets -->
+      <ul class="barnacle-features">
+        <li>
+          <div class="barnacle-feat-icon">🔄</div>
+          <div><strong>Multi-use &amp; Versatile Fit</strong>Holds cans, bottles, and tumblers of virtually any size.</div>
+        </li>
+        <li>
+          <div class="barnacle-feat-icon">⚓</div>
+          <div><strong>Marine-Friendly Materials</strong>UV-resistant and waterproof — built for salt air, sun, and spray.</div>
+        </li>
+        <li>
+          <div class="barnacle-feat-icon">🌡️</div>
+          <div><strong>Heat &amp; Cold Safe</strong>Won't warp in the sun or crack in the cold.</div>
+        </li>
+        <li>
+          <div class="barnacle-feat-icon">🏗️</div>
+          <div><strong>Durable Construction</strong>Grips any flat surface — no screws, no mess.</div>
+        </li>
+      </ul>
+
+      <!-- Standard Shopify Product Form — Optus hooks into this -->
+      {%- form 'product', current_product, id: 'barnacle-product-form', class: 'barnacle-product-form' -%}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" />
+        {%- unless current_product.has_only_default_variant -%}
+          {%- for option in current_product.options_with_values -%}
+            <select name="options[{{ option.name | escape }}]" id="Option-{{ option.position }}">
+              {%- for value in option.values -%}
+                <option value="{{ value | escape }}"
+                  {%- if option.selected_value == value %} selected="selected"{% endif %}>
+                  {{ value }}
+                </option>
+              {%- endfor -%}
+            </select>
+          {%- endfor -%}
+        {%- endunless -%}
+        <button type="submit" name="add" class="barnacle-atc-btn"
+          {%- unless current_variant.available %} disabled{% endunless %}>
+          {%- if current_variant.available -%}
+            Add to Cart &mdash; {{ current_variant.price | money }}
+          {%- else -%}
+            Sold Out
+          {%- endif -%}
+        </button>
+      {%- endform -%}
+
+      <div class="barnacle-trust">
+        <span>🔒 Secure Checkout</span>
+        <span>🚚 Free Shipping</span>
+        <span>↩️ Easy Returns</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE GRID -->
+<section class="barnacle-features-section" id="barnacle-features">
+  <div class="inner">
+    <div class="barnacle-section-header">
+      <div class="barnacle-section-eyebrow">In The Wild</div>
+      <h2 class="barnacle-section-title">Stays put wherever you drop it.</h2>
+    </div>
+
+    <div class="barnacle-feature-row">
+      <div class="barnacle-feature-img">
+        <img src="{{ section.settings.feature_image_1 | image_url: width: 800 }}" alt="Yeti tumbler in The Barnacle on the water" loading="lazy" />
+      </div>
+      <div class="barnacle-feature-text">
+        <div class="barnacle-ft-eyebrow">On The Water</div>
+        <h3 class="barnacle-ft-title">Your drink's new best friend.</h3>
+        <p class="barnacle-ft-body">Whether you're out on the open water or docked at the marina, The Barnacle keeps your tumbler locked in place — even when the waves say otherwise.</p>
+        <div class="barnacle-feat-pill">⚓ Boat-tested, water-approved</div>
+      </div>
+    </div>
+
+    <div class="barnacle-feature-row reverse">
+      <div class="barnacle-feature-img">
+        <img src="{{ section.settings.feature_image_2 | image_url: width: 800 }}" alt="Can in The Barnacle on a cooler" loading="lazy" />
+      </div>
+      <div class="barnacle-feature-text">
+        <div class="barnacle-ft-eyebrow">On The Go</div>
+        <h3 class="barnacle-ft-title">Portable. Grippy. Zero excuses.</h3>
+        <p class="barnacle-ft-body">Cooler lid, tailgate rail, truck bed, kayak deck — if it's flat, The Barnacle owns it. Toss it in your bag and forget it's there until you need it most.</p>
+        <div class="barnacle-feat-pill">🏕️ Trail-ready, tailgate-approved</div>
+      </div>
+    </div>
+
+    <div class="barnacle-feature-row">
+      <div class="barnacle-feature-img">
+        <img src="{{ section.settings.feature_image_3 | image_url: width: 800 }}" alt="Bottle in The Barnacle on a boat" loading="lazy" />
+      </div>
+      <div class="barnacle-feature-text">
+        <div class="barnacle-ft-eyebrow">Bottles Too</div>
+        <h3 class="barnacle-ft-title">Cans, bottles, tumblers — all of them.</h3>
+        <p class="barnacle-ft-body">The Barnacle's adaptive grip cradles everything from a standard 12 oz can to a wide-mouth bottle. One holder. Every drink. Every adventure.</p>
+        <div class="barnacle-feat-pill">🍺 Fits virtually any vessel</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STICKY BAR -->
+<div class="barnacle-sticky" id="barnacle-sticky">
+  <div>
+    <div class="barnacle-sticky__name">The Barnacle</div>
+    <div class="barnacle-sticky__price">{{ current_variant.price | money }} &bull; Free Shipping</div>
+  </div>
+  <button class="barnacle-sticky__btn"
+    onclick="document.querySelector('#barnacle-product-form [name=add]').click()">
+    Add to Cart
+  </button>
+</div>
+
+<!-- FOOTER -->
+<footer class="barnacle-footer">
+  <div class="barnacle-footer__inner">
+    <div class="barnacle-footer__brand">The <span>Barnacle</span></div>
+    {%- form 'customer', class: 'barnacle-footer__email' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter" />
+      <input type="email" name="contact[email]" placeholder="Your email address" required aria-label="Email" />
+      <button type="submit">Join the Crew</button>
+    {%- endform -%}
+    <div class="barnacle-footer__links">
+      <a href="{{ pages['privacy-policy'].url | default: '/policies/privacy-policy' }}">Privacy Policy</a>
+      <a href="{{ pages['terms-of-service'].url | default: '/policies/terms-of-service' }}">Terms of Service</a>
+      <a href="{{ pages['shipping-policy'].url | default: '/policies/shipping-policy' }}">Shipping &amp; Returns</a>
+      <a href="/pages/contact">Contact</a>
+    </div>
+    <div class="barnacle-footer__copy">&copy; {{ 'now' | date: '%Y' }} The Barnacle. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  /* Gallery thumbnails */
+  document.querySelectorAll('.barnacle-gallery__thumb').forEach(function(thumb) {
+    thumb.addEventListener('click', function() {
+      document.querySelectorAll('.barnacle-gallery__thumb').forEach(function(t) { t.classList.remove('active'); });
+      thumb.classList.add('active');
+      var img = document.getElementById('barnacle-main-img');
+      img.style.opacity = '0';
+      setTimeout(function() { img.src = thumb.dataset.src; img.style.opacity = '1'; }, 180);
+    });
+  });
+  document.getElementById('barnacle-main-img').style.transition = 'opacity .18s';
+
+  /* Sticky bar */
+  var buySection = document.getElementById('barnacle-buy');
+  var stickyBar = document.getElementById('barnacle-sticky');
+  if (buySection && stickyBar) {
+    var obs = new IntersectionObserver(function(entries) {
+      stickyBar.classList.toggle('visible', !entries[0].isIntersecting);
+    }, { threshold: 0.1 });
+    obs.observe(buySection);
+  }
+
+  /* Variant selection — Optus hooks into this same mechanism */
+  var variantSelects = document.querySelectorAll('#barnacle-product-form select');
+  variantSelects.forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      /* Shopify's native variant.js or Optus will handle price/availability updates */
+      document.dispatchEvent(new CustomEvent('barnacle:variantChanged', { detail: { form: document.getElementById('barnacle-product-form') } }));
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Barnacle Landing Page",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Background Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_headline",
+      "label": "Hero Headline",
+      "default": "Built for boats, perfected for everywhere else."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheadline",
+      "label": "Hero Subheadline",
+      "default": "The portable, multi-use beverage holder designed to fit cans and cups of all sizes. Secure your drink on the water, on the trail, or on the tailgate."
+    },
+    {
+      "type": "text",
+      "id": "product_tagline",
+      "label": "Product Tagline",
+      "default": "Your drink's new best friend — on the water, on the road, or at the tailgate."
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image_1",
+      "label": "Feature Row 1 Image (On The Water)"
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image_2",
+      "label": "Feature Row 2 Image (On The Go)"
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image_3",
+      "label": "Feature Row 3 Image (Bottles)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barnacle Landing Page"
+    }
+  ]
+}
+{% endschema %}

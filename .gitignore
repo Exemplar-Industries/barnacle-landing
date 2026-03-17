@@ -1,0 +1,4 @@
+*.py
+image-notes*.txt
+__pycache__/
+.DS_Store
