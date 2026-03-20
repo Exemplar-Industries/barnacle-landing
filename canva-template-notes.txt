@@ -1,0 +1,81 @@
+CANVA TEMPLATE ANALYSIS — "8.5x11 BARNACLE TEMPLATE NEWEST"
+============================================================
+
+TEMPLATE STRUCTURE (45 pages total):
+- Page 1: Full template with gray background — shows the complete ring disc design
+- Page 2: White background version — shows the ring outline/guide circle and Barnacle logo fish
+- Page 3: Repeating "THE BARNACLE.co" text arcs (mirrored/flipped) — these are the background watermark text layers
+- Page 4: "SAMPLE NAME / XXX, XX" version — shows where customer name and location text go
+- Page 5: "POWER MOVE / CAPE MAY, NJ" — a real completed example with boat/marlin icons
+
+KEY DESIGN STRUCTURE:
+- Outer ring disc (gray): Large circle, fills most of the 8.5x11 page
+- Red ring: Thin red circle border separating the gray outer area from the black inner ring
+- Black ring: The main customizable ring band (annular zone between red circle and white center)
+- White center circle: The hole/cutout where the silicone cup sits through
+- Center dot: Small registration/center mark
+
+TEXT PLACEMENT:
+- TOP ARC: "THE BARNACLE.co" in handwritten/graffiti font, curves along top of outer gray ring
+- BOTTOM ARC: Customer's custom text (e.g. "SAMPLE NAME" / "POWER MOVE") in block/collegiate font
+- BOTTOM SECOND LINE: Location/subtitle text (e.g. "XXX, XX" / "CAPE MAY, NJ") in same collegiate font
+
+LAYER STRUCTURE (from page 3 — the text layer page):
+- Multiple mirrored/rotated versions of "THE BARNACLE.co" text arcs
+- These form the repeating background watermark pattern on the gray ring area
+
+PROPORTIONS (estimated from 8.5x11 canvas):
+- Canvas: 8.5" x 11" = 816 x 1056px at 96dpi, or 2550 x 3300px at 300dpi
+- Outer disc diameter: ~7" (fills most of the width)
+- Red ring outer diameter: ~4.8"
+- Black ring inner diameter (white center): ~3.2"
+- The printable/customizable zone is the GRAY OUTER RING (between outer edge and red ring)
+- The BLACK RING is also customizable (image/pattern goes here)
+- The WHITE CENTER is the cutout — nothing should be designed here (it's the hole)
+
+WHAT CUSTOMER CUSTOMIZES:
+1. Background pattern/image on the BLACK RING zone
+2. Custom text on the BOTTOM ARC of the GRAY OUTER RING
+3. Font choice for the bottom arc text
+
+WHAT IS FIXED (always printed):
+1. "THE BARNACLE.co" top arc text
+2. Red ring border
+3. The repeating watermark text in the gray area background
+
+BACKEND AUTOMATION OPPORTUNITY:
+- Customer submits: custom text, font, optional image/pattern
+- System needs to: populate the Canva template layers with this data
+- Canva API (or image compositing) can update: the bottom text layer, the black ring image layer
+- Output: print-ready PDF at 300dpi matching the template exactly
+
+ADDITIONAL PAGES (6-10):
+- Page 6: "FIRST MATE / CAPE MAY, NJ" — gray background, standard template
+- Page 7: "FIRST MATE / CAPE MAY, NJ" — with SUNSET PHOTO as background (image fills the entire disc, no gray)
+  IMPORTANT: When a photo is used, it fills the ENTIRE disc circle (not just the black ring zone)
+  The "THE BARNACLE.co" text and custom text still overlay on top of the photo
+  The white center hole remains white/clear
+- Page 8: Pattern library page — shows available preset patterns:
+  sprinkles, basket weave, teal-to-orange gradient, gingham/plaid,
+  wood planks, pink wavy checkerboard, blue floral line art,
+  Fishing & Boating Expo logo (example of logo upload), Whiting-Turner logo
+- Page 9: USA FLAG version — flag fills entire disc, "THE BARNACLE.co" on top, no custom text on this one
+- Page 10: Tuna/fish photo fills entire disc circle — just the image, no text overlay
+
+KEY INSIGHT FROM PAGE 7 (SUNSET VERSION):
+The template has TWO modes:
+1. GRAY BACKGROUND mode: gray disc + black ring + customer image fills just the ring zone
+2. PHOTO BACKGROUND mode: customer photo fills the ENTIRE disc circle, text overlays on top
+
+The live preview configurator should match the PHOTO BACKGROUND mode since that's what customers upload.
+When a photo is uploaded, it should fill the entire disc (clipped to circle), with:
+- "THE BARNACLE.co" arc text at top (fixed, always shown)
+- Customer name arc text at bottom
+- White center hole punched out
+
+PROPORTIONS (refined from page 7 sunset version):
+- The disc is a perfect circle
+- Center hole = approximately 30% of disc diameter
+- The "THE BARNACLE.co" text arc radius = approximately 85% of disc radius
+- The customer name text arc radius = approximately 85% of disc radius (bottom)
+- Text sits in the outer ring area, between the center hole and the disc edge

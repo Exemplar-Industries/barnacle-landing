@@ -330,6 +330,14 @@
 
     /* Preset patterns */
     .preset-patterns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .text-size-btn {
+      padding: 8px 20px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,.2);
+      background: transparent; color: rgba(255,255,255,.6); font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: all .18s;
+    }
+    .text-size-btn.active, .text-size-btn:hover {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+    }
     .preset-btn {
       padding: 7px 14px; border-radius: 50px;
       border: 1px solid rgba(255,255,255,.2);
@@ -735,9 +743,17 @@
               class="config-input"
               id="customText"
               placeholder="e.g. The Crew, Lake Life, Mr. Lund..."
-              maxlength="24"
+              maxlength="32"
               oninput="renderPreview()"
             />
+            <!-- Text Size -->
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Size</div>
+              <div style="display:flex;gap:10px;">
+                <button class="text-size-btn active" id="sizeM" onclick="setTextSize('medium',this)">Medium</button>
+                <button class="text-size-btn" id="sizeL" onclick="setTextSize('large',this)">Large</button>
+              </div>
+            </div>
 
             <!-- Font Picker -->
             <div class="font-picker-wrap">
@@ -1053,21 +1069,64 @@ function setPreset(name, el) {
 /* ================================================================
    IMAGE UPLOAD
 ================================================================ */
+/* ================================================================
+   CLIENT-SIDE IMAGE UPSCALER
+   Uses canvas bicubic-equivalent upscaling to maximize resolution
+   before rendering. Targets minimum 2000px on the longest side.
+================================================================ */
+function upscaleImage(img, targetSize) {
+  // If image is already large enough, return as-is
+  const maxDim = Math.max(img.naturalWidth, img.naturalHeight);
+  if (maxDim >= targetSize) return img;
+  // Multi-step upscale: double size repeatedly until target reached
+  let currentW = img.naturalWidth;
+  let currentH = img.naturalHeight;
+  let currentSrc = img;
+  while (Math.max(currentW, currentH) < targetSize) {
+    const scale = Math.min(2, targetSize / Math.max(currentW, currentH));
+    const offscreen = document.createElement('canvas');
+    offscreen.width  = Math.round(currentW * scale);
+    offscreen.height = Math.round(currentH * scale);
+    const octx = offscreen.getContext('2d');
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(currentSrc, 0, 0, offscreen.width, offscreen.height);
+    const upscaled = new Image();
+    upscaled.src = offscreen.toDataURL('image/png');
+    currentSrc = upscaled;
+    currentW = offscreen.width;
+    currentH = offscreen.height;
+  }
+  return currentSrc;
+}
+
 function handlePatternUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
+  // Show uploading indicator
+  const zone = document.getElementById('uploadZone');
+  const origTitle = zone.querySelector('.upload-title').textContent;
+  zone.querySelector('.upload-title').textContent = 'Upscaling for print quality...';
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
     img.onload = () => {
-      uploadedImageObj = img; presetImageObj = null; currentPattern = 'uploaded';
-      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-      const strip = document.getElementById('uploadStrip');
-      const thumb = document.createElement('div');
-      thumb.className = 'upload-thumb active';
-      thumb.innerHTML = `<img src="${ev.target.result}" alt="uploaded" />`;
-      strip.innerHTML = ''; strip.appendChild(thumb);
-      renderPreview();
+      // Upscale to at least 2000px for print quality
+      const upscaled = upscaleImage(img, 2000);
+      // Wait for upscaled image to be ready (may be async if it went through canvas)
+      const finalize = (finalImg) => {
+        uploadedImageObj = finalImg; presetImageObj = null; currentPattern = 'uploaded';
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        const strip = document.getElementById('uploadStrip');
+        const thumb = document.createElement('div');
+        thumb.className = 'upload-thumb active';
+        thumb.innerHTML = `<img src="${ev.target.result}" alt="uploaded" />`;
+        strip.innerHTML = ''; strip.appendChild(thumb);
+        zone.querySelector('.upload-title').textContent = origTitle;
+        renderPreview();
+      };
+      if (upscaled.complete) { finalize(upscaled); }
+      else { upscaled.onload = () => finalize(upscaled); }
     };
     img.src = ev.target.result;
   };
@@ -1087,201 +1146,211 @@ uploadZone.addEventListener('drop', e => {
 });
 
 /* ================================================================
-   CANVAS RENDERER
-   Draws a realistic top-down view of The Barnacle:
-   - Wood grain background (matches the product photo backdrop)
-   - Outer ring (customizable pattern or color)
-   - Inner silicone cup (base color with 3D shading)
-   - Curved text on the ring with optional stroke
+   CANVAS RENDERER — Matches Canva template exactly
+   Structure (top-down view):
+   1. Wood grain background (outside disc)
+   2. Full disc circle: image/pattern fills entire disc (clipped)
+      OR gray disc if no image
+   3. Red ring border (thin accent ring)
+   4. Silicone cup dome (3D shaded, base color)
+   5. White center hole
+   6. TOP ARC: "THE BARNACLE.co" in Permanent Marker font (fixed)
+   7. BOTTOM ARC: customer custom text in chosen font
 ================================================================ */
 const canvas = document.getElementById('previewCanvas');
 const ctx    = canvas.getContext('2d');
-const CX = 300, CY = 300;
-const R_OUTER = 268;   // outer ring radius
-const R_INNER = 168;   // inner cup radius
-const R_CUP   = 96;    // cup opening
 
-// Load wood background for canvas
+const CX = 300, CY = 300;
+const R_DISC        = 278;   // full outer disc radius
+const R_RED_OUTER   = 192;   // red ring outer radius
+const R_RED_INNER   = 182;   // red ring inner radius
+const R_CUP_OUTER   = 168;   // silicone dome outer radius
+const R_HOLE        = 96;    // white center hole radius
+const R_TOP_TEXT    = 238;   // "THE BARNACLE.co" arc radius
+const R_BOTTOM_TEXT = 224;   // customer text arc radius
+
+let currentTextSize = 'medium';
+
+function setTextSize(size, el) {
+  currentTextSize = size;
+  document.querySelectorAll('.text-size-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderPreview();
+}
+
+// Load wood background
 const woodBg = new Image();
 woodBg.crossOrigin = 'anonymous';
 woodBg.onload = renderPreview;
 woodBg.src = 'images/barnacle-topdown-wood-clean-nodrink.jpg';
 
+function renderArcText(text, radius, midAngleDeg, fontSize, fontFamily, weight, fillColor, strokeColor, strokeW) {
+  if (!text) return;
+  const midAngle = (midAngleDeg * Math.PI) / 180;
+  ctx.save();
+  ctx.font = `${weight} ${fontSize}px '${fontFamily}', cursive, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const chars = text.split('');
+  // Measure total arc width
+  const totalW = chars.reduce((sum, c) => sum + ctx.measureText(c).width * 1.05, 0);
+  const totalAngle = totalW / radius;
+  const startAngle = midAngle - totalAngle / 2;
+  let currentAngle = startAngle;
+  for (let i = 0; i < chars.length; i++) {
+    const cw = ctx.measureText(chars[i]).width * 1.05;
+    const charAngle = currentAngle + cw / (2 * radius);
+    ctx.save();
+    ctx.translate(CX + radius * Math.cos(charAngle), CY + radius * Math.sin(charAngle));
+    ctx.rotate(charAngle + Math.PI / 2);
+    ctx.font = `${weight} ${fontSize}px '${fontFamily}', cursive, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (strokeColor && strokeColor !== 'none') {
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = strokeW * 2;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(chars[i], 0, 0);
+    }
+    ctx.fillStyle = fillColor;
+    ctx.fillText(chars[i], 0, 0);
+    ctx.restore();
+    currentAngle += cw / radius;
+  }
+  ctx.restore();
+}
+
 function renderPreview() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // ---- WOOD BACKGROUND ----
+  // 1. WOOD BACKGROUND
   if (woodBg.complete && woodBg.naturalWidth > 0) {
-    ctx.save();
     ctx.drawImage(woodBg, 0, 0, W, H);
-    // Slight darken vignette on background
-    const bgVig = ctx.createRadialGradient(CX, CY, R_OUTER * 0.8, CX, CY, W * 0.8);
-    bgVig.addColorStop(0, 'rgba(0,0,0,0)');
-    bgVig.addColorStop(1, 'rgba(0,0,0,.45)');
-    ctx.fillStyle = bgVig;
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
   } else {
     ctx.fillStyle = '#c8a96e';
     ctx.fillRect(0, 0, W, H);
   }
 
-  // ---- RING SHADOW (depth) ----
+  // 2. DISC DROP SHADOW
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.55)';
-  ctx.shadowBlur = 28;
-  ctx.shadowOffsetY = 6;
+  ctx.shadowColor = 'rgba(0,0,0,.6)';
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetY = 10;
   ctx.beginPath();
-  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
-  ctx.fillStyle = '#000';
+  ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
+  ctx.fillStyle = '#555';
   ctx.fill();
   ctx.restore();
 
-  // ---- OUTER RING ----
+  // 3. FULL DISC — image fills entire disc OR gray
   ctx.save();
   ctx.beginPath();
-  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
+  ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
   ctx.closePath();
   ctx.clip();
-
   const patternSrc = uploadedImageObj || presetImageObj;
   if (patternSrc) {
-    const s = R_OUTER * 2;
-    ctx.drawImage(patternSrc, CX - R_OUTER, CY - R_OUTER, s, s);
+    ctx.drawImage(patternSrc, CX - R_DISC, CY - R_DISC, R_DISC * 2, R_DISC * 2);
   } else {
-    // Plain ring — white/light gray disc
-    ctx.fillStyle = '#e8e8e8';
+    ctx.fillStyle = '#9e9e9e';
+    ctx.beginPath();
+    ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
     ctx.fill();
-    // Subtle ring texture
-    const ringGrad = ctx.createRadialGradient(CX - 40, CY - 40, 20, CX, CY, R_OUTER);
-    ringGrad.addColorStop(0, 'rgba(255,255,255,.3)');
-    ringGrad.addColorStop(1, 'rgba(0,0,0,.08)');
-    ctx.fillStyle = ringGrad;
-    ctx.fill();
+    const grayGrad = ctx.createRadialGradient(CX - 70, CY - 70, 20, CX, CY, R_DISC);
+    grayGrad.addColorStop(0, 'rgba(255,255,255,.2)');
+    grayGrad.addColorStop(1, 'rgba(0,0,0,.15)');
+    ctx.fillStyle = grayGrad;
+    ctx.fillRect(CX - R_DISC, CY - R_DISC, R_DISC * 2, R_DISC * 2);
   }
   ctx.restore();
 
-  // Ring edge highlight
+  // Disc edge
   ctx.beginPath();
-  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,.25)';
+  ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0,0,0,.3)';
   ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  // ---- SILICONE CUP (base color) ----
+  // 4. RED RING BORDER
+  ctx.beginPath();
+  ctx.arc(CX, CY, (R_RED_OUTER + R_RED_INNER) / 2, 0, Math.PI * 2);
+  ctx.strokeStyle = '#e53e3e';
+  ctx.lineWidth = R_RED_OUTER - R_RED_INNER;
+  ctx.stroke();
+
+  // 5. SILICONE CUP DOME (base color, 3D shaded)
   const baseColors = {
-    white: { fill: '#f2f2f2', highlight: '#ffffff', shadow: '#c0c0c0', rim: '#d8d8d8', mid: '#e8e8e8' },
-    black: { fill: '#1c1c1c', highlight: '#3c3c3c', shadow: '#080808', rim: '#282828', mid: '#242424' },
-    pink:  { fill: '#ec4899', highlight: '#f472b6', shadow: '#be185d', rim: '#db2777', mid: '#e879a8' },
+    white: { fill: '#f0f0f0', highlight: '#ffffff', shadow: '#b8b8b8', rim: '#d0d0d0', mid: '#e4e4e4' },
+    black: { fill: '#1c1c1c', highlight: '#3a3a3a', shadow: '#080808', rim: '#262626', mid: '#242424' },
+    pink:  { fill: '#ec4899', highlight: '#f9a8d4', shadow: '#be185d', rim: '#db2777', mid: '#f472b6' },
   };
   const bc = baseColors[currentBaseColor] || baseColors.white;
 
-  // Cup body shadow
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.4)';
-  ctx.shadowBlur = 20;
-  ctx.shadowOffsetY = 4;
+  ctx.shadowColor = 'rgba(0,0,0,.45)';
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 5;
   ctx.beginPath();
-  ctx.arc(CX, CY, R_INNER, 0, Math.PI * 2);
+  ctx.arc(CX, CY, R_CUP_OUTER, 0, Math.PI * 2);
   ctx.fillStyle = bc.fill;
   ctx.fill();
   ctx.restore();
 
-  // Cup body gradient (3D dome look)
-  const cupGrad = ctx.createRadialGradient(CX - 45, CY - 45, 8, CX, CY, R_INNER);
-  cupGrad.addColorStop(0,   bc.highlight);
-  cupGrad.addColorStop(0.35, bc.mid);
+  const cupGrad = ctx.createRadialGradient(CX - 42, CY - 42, 6, CX, CY, R_CUP_OUTER);
+  cupGrad.addColorStop(0,    bc.highlight);
+  cupGrad.addColorStop(0.3,  bc.mid);
   cupGrad.addColorStop(0.75, bc.fill);
-  cupGrad.addColorStop(1,   bc.shadow);
+  cupGrad.addColorStop(1,    bc.shadow);
   ctx.beginPath();
-  ctx.arc(CX, CY, R_INNER, 0, Math.PI * 2);
+  ctx.arc(CX, CY, R_CUP_OUTER, 0, Math.PI * 2);
   ctx.fillStyle = cupGrad;
   ctx.fill();
-
-  // Cup rim
   ctx.beginPath();
-  ctx.arc(CX, CY, R_INNER, 0, Math.PI * 2);
+  ctx.arc(CX, CY, R_CUP_OUTER, 0, Math.PI * 2);
   ctx.strokeStyle = bc.rim;
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // ---- CUP OPENING — matches base color, darker inner ----
-  const holeColors = {
-    white: { outer: '#c8c8c8', inner: '#909090' },
-    black: { outer: '#111111', inner: '#050505' },
-    pink:  { outer: '#be185d', inner: '#881337' },
-  };
-  const hc = holeColors[currentBaseColor] || holeColors.white;
-  const holeGrad = ctx.createRadialGradient(CX - 12, CY - 12, 4, CX, CY, R_CUP);
-  holeGrad.addColorStop(0, hc.outer);
-  holeGrad.addColorStop(0.5, hc.inner);
-  holeGrad.addColorStop(1, hc.inner);
+  // 6. WHITE CENTER HOLE
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.6)';
-  ctx.shadowBlur = 18;
+  ctx.shadowColor = 'rgba(0,0,0,.5)';
+  ctx.shadowBlur = 14;
   ctx.beginPath();
-  ctx.arc(CX, CY, R_CUP, 0, Math.PI * 2);
-  ctx.fillStyle = holeGrad;
+  ctx.arc(CX, CY, R_HOLE, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
   ctx.fill();
   ctx.restore();
-
-  // Inner rim highlight
+  // Center dot
   ctx.beginPath();
-  ctx.arc(CX, CY, R_CUP, 0, Math.PI * 2);
-  ctx.strokeStyle = bc.rim;
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  ctx.arc(CX, CY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,.35)';
+  ctx.fill();
 
-  // ---- CURVED TEXT ON RING ----
-  const text = document.getElementById('customText').value.trim();
-  if (text) {
-    const textRadius = (R_OUTER + R_INNER) / 2 + 6;
-    const fontSize   = Math.min(38, Math.max(16, Math.floor(230 / text.length)));
-    const strokeW    = parseInt(document.getElementById('strokeWidth').value) || 2;
+  // 7. TOP ARC: "THE BARNACLE.co" — fixed, Permanent Marker, top half
+  // midAngle = -90deg (top), arc spans ~120deg
+  renderArcText('THE BARNACLE.co', R_TOP_TEXT, -90, 21, 'Permanent Marker', '800', '#111111', null, 0);
 
-    ctx.save();
-    ctx.font = `700 ${fontSize}px '${currentFont}', sans-serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-
-    const totalAngle = Math.min(Math.PI * 1.3, (text.length * fontSize * 0.62) / textRadius);
-    const startAngle = -Math.PI / 2 - totalAngle / 2;
-
-    for (let i = 0; i < text.length; i++) {
-      const charAngle = startAngle + (i + 0.5) * (totalAngle / text.length);
-      ctx.save();
-      ctx.translate(
-        CX + textRadius * Math.cos(charAngle),
-        CY + textRadius * Math.sin(charAngle)
-      );
-      ctx.rotate(charAngle + Math.PI / 2);
-
-      // Stroke (border) pass first
-      if (currentStrokeColor !== 'none') {
-        ctx.strokeStyle = currentStrokeColor;
-        ctx.lineWidth   = strokeW * 2;
-        ctx.lineJoin    = 'round';
-        ctx.strokeText(text[i], 0, 0);
-      }
-
-      // Fill pass
-      ctx.fillStyle = currentTextColor;
-      ctx.fillText(text[i], 0, 0);
-      ctx.restore();
-    }
-    ctx.restore();
+  // 8. BOTTOM ARC: customer text — bottom half, midAngle = 90deg
+  const customText = document.getElementById('customText').value.trim();
+  if (customText) {
+    const strokeW  = parseInt(document.getElementById('strokeWidth').value) || 2;
+    const fontSize = currentTextSize === 'large' ? 34 : 26;
+    renderArcText(customText, R_BOTTOM_TEXT, 90, fontSize, currentFont, '800', currentTextColor,
+      (currentStrokeColor && currentStrokeColor !== 'none') ? currentStrokeColor : null, strokeW);
   }
 
-  // ---- SUBTLE VIGNETTE ON RING EDGES ----
-  const vignette = ctx.createRadialGradient(CX, CY, R_INNER * 0.5, CX, CY, R_OUTER * 1.05);
+  // 9. OUTER VIGNETTE
+  const vignette = ctx.createRadialGradient(CX, CY, R_DISC * 0.72, CX, CY, R_DISC * 1.05);
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
-  vignette.addColorStop(0.7, 'rgba(0,0,0,0)');
   vignette.addColorStop(1, 'rgba(0,0,0,.22)');
+  ctx.save();
   ctx.beginPath();
-  ctx.arc(CX, CY, R_OUTER, 0, Math.PI * 2);
+  ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
+  ctx.clip();
   ctx.fillStyle = vignette;
-  ctx.fill();
+  ctx.fillRect(CX - R_DISC, CY - R_DISC, R_DISC * 2, R_DISC * 2);
+  ctx.restore();
 }
 
 // Initial render
