@@ -25,19 +25,48 @@
 {%- assign current_variant = current_product.selected_or_first_available_variant -%}
 
 <style>
+  /* ============================================================
+     HIDE DAWN HEADER, FOOTER, AND ANNOUNCEMENT BAR
+     The barnacle landing page owns 100% of the viewport.
+  ============================================================ */
+  body.barnacle-page header,
+  body.barnacle-page .shopify-section-header,
+  body.barnacle-page #shopify-section-header,
+  body.barnacle-page site-header,
+  body.barnacle-page .header-wrapper,
+  body.barnacle-page footer,
+  body.barnacle-page .footer,
+  body.barnacle-page #shopify-section-footer,
+  body.barnacle-page .shopify-section-footer,
+  body.barnacle-page .announcement-bar,
+  body.barnacle-page #shopify-section-announcement-bar,
+  body.barnacle-page .shopify-section-group-header-group {
+    display: none !important;
+  }
+  body.barnacle-page {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  body.barnacle-page main {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
   /* Scoped to this section to avoid conflicts with Dawn base styles */
   .barnacle-section * { box-sizing: border-box; }
 
   /* ---- HERO ---- */
   .barnacle-hero {
     position: relative;
+    min-height: 100vh;
     min-height: 100svh;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
   }
   .barnacle-hero__bg {
-    position: absolute; inset: 0;
-    background-image: url('{{ section.settings.hero_image | image_url: width: 2000 }}');
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
     background-size: cover; background-position: center 30%;
   }
   .barnacle-hero__overlay {
@@ -343,7 +372,7 @@
 
 <!-- HERO -->
 <section class="barnacle-hero" id="barnacle-hero">
-  <div class="barnacle-hero__bg"></div>
+  <div class="barnacle-hero__bg" style="background-image:url('https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/hero-hydro-wide.png?v=1774008255')"></div>
   <div class="barnacle-hero__overlay"></div>
   <div class="barnacle-hero__content">
     <div class="barnacle-hero__eyebrow">The Barnacle &mdash; Portable Beverage Holder</div>
@@ -618,7 +647,7 @@
 
     <div class="barnacle-feature-row">
       <div class="barnacle-feature-img">
-        <img src="{{ section.settings.feature_image_1 | image_url: width: 800 }}" alt="Yeti tumbler in The Barnacle on the water" loading="lazy" />
+        <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp?v=1774008226" alt="Yeti tumbler in The Barnacle on the water" loading="lazy" />
       </div>
       <div class="barnacle-feature-text">
         <div class="barnacle-ft-eyebrow">On The Water</div>
@@ -630,7 +659,7 @@
 
     <div class="barnacle-feature-row reverse">
       <div class="barnacle-feature-img">
-        <img src="{{ section.settings.feature_image_2 | image_url: width: 800 }}" alt="Can in The Barnacle on a cooler" loading="lazy" />
+        <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/can-action-final.png?v=1774008251" alt="Can in The Barnacle on a cooler" loading="lazy" />
       </div>
       <div class="barnacle-feature-text">
         <div class="barnacle-ft-eyebrow">On The Go</div>
@@ -642,7 +671,7 @@
 
     <div class="barnacle-feature-row">
       <div class="barnacle-feature-img">
-        <img src="{{ section.settings.feature_image_3 | image_url: width: 800 }}" alt="Bottle in The Barnacle on a boat" loading="lazy" />
+        <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/modelo-boat.webp?v=1774008257" alt="Bottle in The Barnacle on a boat" loading="lazy" />
       </div>
       <div class="barnacle-feature-text">
         <div class="barnacle-ft-eyebrow">Bottles Too</div>
