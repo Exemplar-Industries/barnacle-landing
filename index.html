@@ -554,7 +554,7 @@
       </div>
     </div>
 
-    <div class="feature-row">
+     <div class="feature-row">
       <div class="feature-img">
         <img src="images/can-action-final.png" alt="Can secured in The Barnacle on a cooler near rapids" loading="lazy" />
       </div>
@@ -565,7 +565,17 @@
         <div class="feat-pill">🏕️ Trail-ready, tailgate-approved</div>
       </div>
     </div>
-
+    <div class="feature-row reverse">
+      <div class="feature-img">
+        <img src="images/barnacle-phone-holder.jpg" alt="The Barnacle holding a phone upright on a wooden table" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="ft-eyebrow">More Than a Cup Holder</div>
+        <h3>Holds your phone, your mug, your can — anything that fits.</h3>
+        <p>The flexible silicone ring stretches to grip drinks from 12 oz cans all the way up to 40 oz tumblers — and it holds your phone upright too. One product, endless uses. Patent pending.</p>
+        <div class="feat-pill">📱 Patent Pending — Designed in the USA</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -602,6 +612,9 @@
           </div>
           <div class="gallery-thumb" data-src="images/barnacle-lifestyle-1.jpg">
             <img src="images/barnacle-lifestyle-1.jpg" alt="Pink and black color options" />
+          </div>
+          <div class="gallery-thumb" data-src="images/barnacle-phone-holder.jpg">
+            <img src="images/barnacle-phone-holder.jpg" alt="Phone stand" />
           </div>
         </div>
       </div>
@@ -1162,12 +1175,12 @@ const ctx    = canvas.getContext('2d');
 
 const CX = 300, CY = 300;
 const R_DISC        = 278;   // full outer disc radius
-const R_RED_OUTER   = 192;   // red ring outer radius
-const R_RED_INNER   = 182;   // red ring inner radius
-const R_CUP_OUTER   = 168;   // silicone dome outer radius
-const R_HOLE        = 96;    // white center hole radius
-const R_TOP_TEXT    = 238;   // "THE BARNACLE.co" arc radius
-const R_BOTTOM_TEXT = 224;   // customer text arc radius
+const R_RED_OUTER   = 176;   // red ring outer radius  (tight against cup)
+const R_RED_INNER   = 168;   // red ring inner radius  (= R_CUP_OUTER edge)
+const R_CUP_OUTER   = 162;   // silicone dome outer radius
+const R_HOLE        = 92;    // white center hole radius
+const R_TOP_TEXT    = 248;   // "THE BARNACLE.co" arc radius (outer ring area)
+const R_BOTTOM_TEXT = 248;   // customer text arc radius
 
 let currentTextSize = 'medium';
 
@@ -1184,38 +1197,47 @@ woodBg.crossOrigin = 'anonymous';
 woodBg.onload = renderPreview;
 woodBg.src = 'images/barnacle-topdown-wood-clean-nodrink.jpg';
 
-function renderArcText(text, radius, midAngleDeg, fontSize, fontFamily, weight, fillColor, strokeColor, strokeW) {
+function renderArcText(text, radius, midAngleDeg, fontSize, fontFamily, weight, fillColor, strokeColor, strokeW, flip) {
   if (!text) return;
+  // flip=true  → bottom arc: characters read right-side-up (rotate -PI/2)
+  // flip=false → top arc:    characters point outward (rotate +PI/2)
   const midAngle = (midAngleDeg * Math.PI) / 180;
   ctx.save();
   ctx.font = `${weight} ${fontSize}px '${fontFamily}', cursive, sans-serif`;
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.textBaseline = flip ? 'top' : 'alphabetic';
   const chars = text.split('');
-  // Measure total arc width
-  const totalW = chars.reduce((sum, c) => sum + ctx.measureText(c).width * 1.05, 0);
+  const totalW = chars.reduce((sum, c) => sum + ctx.measureText(c).width * 1.08, 0);
   const totalAngle = totalW / radius;
-  const startAngle = midAngle - totalAngle / 2;
+  // For flip (bottom arc), reverse character order so text reads L→R
+  const orderedChars = flip ? [...chars].reverse() : chars;
+  const startAngle = flip
+    ? midAngle + totalAngle / 2   // start from right side, go counter-clockwise
+    : midAngle - totalAngle / 2;
+  const direction = flip ? -1 : 1;
   let currentAngle = startAngle;
-  for (let i = 0; i < chars.length; i++) {
-    const cw = ctx.measureText(chars[i]).width * 1.05;
-    const charAngle = currentAngle + cw / (2 * radius);
+  for (let i = 0; i < orderedChars.length; i++) {
+    const ch = orderedChars[i];
+    const cw = ctx.measureText(ch).width * 1.08;
+    const charAngle = currentAngle + direction * cw / (2 * radius);
     ctx.save();
     ctx.translate(CX + radius * Math.cos(charAngle), CY + radius * Math.sin(charAngle));
-    ctx.rotate(charAngle + Math.PI / 2);
+    // Top arc: rotate so baseline faces outward (+PI/2)
+    // Bottom arc: rotate so baseline faces inward (-PI/2), text reads right-side-up
+    ctx.rotate(flip ? charAngle - Math.PI / 2 : charAngle + Math.PI / 2);
     ctx.font = `${weight} ${fontSize}px '${fontFamily}', cursive, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textBaseline = flip ? 'top' : 'alphabetic';
     if (strokeColor && strokeColor !== 'none') {
       ctx.strokeStyle = strokeColor;
       ctx.lineWidth = strokeW * 2;
       ctx.lineJoin = 'round';
-      ctx.strokeText(chars[i], 0, 0);
+      ctx.strokeText(ch, 0, 0);
     }
     ctx.fillStyle = fillColor;
-    ctx.fillText(chars[i], 0, 0);
+    ctx.fillText(ch, 0, 0);
     ctx.restore();
-    currentAngle += cw / radius;
+    currentAngle += direction * cw / radius;
   }
   ctx.restore();
 }
@@ -1276,7 +1298,7 @@ function renderPreview() {
   ctx.beginPath();
   ctx.arc(CX, CY, (R_RED_OUTER + R_RED_INNER) / 2, 0, Math.PI * 2);
   ctx.strokeStyle = '#e53e3e';
-  ctx.lineWidth = R_RED_OUTER - R_RED_INNER;
+  ctx.lineWidth = R_RED_OUTER - R_RED_INNER + 2;  // +2 for visibility
   ctx.stroke();
 
   // 5. SILICONE CUP DOME (base color, 3D shaded)
@@ -1329,15 +1351,15 @@ function renderPreview() {
 
   // 7. TOP ARC: "THE BARNACLE.co" — fixed, Permanent Marker, top half
   // midAngle = -90deg (top), arc spans ~120deg
-  renderArcText('THE BARNACLE.co', R_TOP_TEXT, -90, 21, 'Permanent Marker', '800', '#111111', null, 0);
+  renderArcText('THE BARNACLE.co', R_TOP_TEXT, -90, 30, 'Permanent Marker', '800', '#111111', null, 0, false);
 
   // 8. BOTTOM ARC: customer text — bottom half, midAngle = 90deg
   const customText = document.getElementById('customText').value.trim();
   if (customText) {
     const strokeW  = parseInt(document.getElementById('strokeWidth').value) || 2;
-    const fontSize = currentTextSize === 'large' ? 34 : 26;
+    const fontSize = currentTextSize === 'large' ? 42 : 32;
     renderArcText(customText, R_BOTTOM_TEXT, 90, fontSize, currentFont, '800', currentTextColor,
-      (currentStrokeColor && currentStrokeColor !== 'none') ? currentStrokeColor : null, strokeW);
+      (currentStrokeColor && currentStrokeColor !== 'none') ? currentStrokeColor : null, strokeW, true);
   }
 
   // 9. OUTER VIGNETTE
