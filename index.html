@@ -1165,25 +1165,23 @@ uploadZone.addEventListener('drop', e => {
    2. Full disc circle: image/pattern fills entire disc (clipped)
       OR gray disc if no image
    3. Red ring border (thin accent ring)
-   4. Silicone cup dome (3D shaded, base color)
-   5. White center hole
-   6. TOP ARC: "THE BARNACLE.co" in Permanent Marker font (fixed)
-   7. BOTTOM ARC: customer custom text in chosen font
+   3. Silicone cup dome (3D shaded, base color)
+   4. White center hole
+   5. Customer text arcing along the TOP of the ring (reads L→R, stays inside disc)
 ================================================================ */
 const canvas = document.getElementById('previewCanvas');
 const ctx    = canvas.getContext('2d');
-
 const CX = 300, CY = 300;
-const R_DISC        = 278;   // full outer disc radius
-const R_RED_OUTER   = 176;   // red ring outer radius  (tight against cup)
-const R_RED_INNER   = 168;   // red ring inner radius  (= R_CUP_OUTER edge)
-const R_CUP_OUTER   = 162;   // silicone dome outer radius
-const R_HOLE        = 92;    // white center hole radius
-const R_TOP_TEXT    = 248;   // "THE BARNACLE.co" arc radius (outer ring area)
-const R_BOTTOM_TEXT = 248;   // customer text arc radius
+
+// ── Radii ──────────────────────────────────────────────────────────────────
+const R_DISC      = 278;  // full outer disc radius
+const R_CUP_OUTER = 168;  // silicone dome outer radius
+const R_HOLE      = 96;   // white center hole radius
+// Text sits in the band between R_CUP_OUTER and R_DISC
+// Place baseline at ~88% of the way from center to edge = nice mid-band position
+const R_TEXT      = 234;  // arc radius for customer text baseline
 
 let currentTextSize = 'medium';
-
 function setTextSize(size, el) {
   currentTextSize = size;
   document.querySelectorAll('.text-size-btn').forEach(b => b.classList.remove('active'));
@@ -1191,57 +1189,74 @@ function setTextSize(size, el) {
   renderPreview();
 }
 
-// Load wood background
+// ── Wood background image ──────────────────────────────────────────────────
 const woodBg = new Image();
-woodBg.crossOrigin = 'anonymous';
-woodBg.onload = renderPreview;
 woodBg.src = 'images/barnacle-topdown-wood-clean-nodrink.jpg';
+woodBg.onload = renderPreview;
 
-function renderArcText(text, radius, midAngleDeg, fontSize, fontFamily, weight, fillColor, strokeColor, strokeW, flip) {
+// ── Simple, reliable top-arc text renderer ─────────────────────────────────
+// Places text along the TOP of the ring (arc from ~210° to ~330°, centred at 270° = top)
+// All characters read left-to-right, baseline faces outward (away from centre).
+// Font size auto-shrinks if text is too long to fit within the ring band.
+function drawTopArcText(text, radius, maxFontSize, fontFamily, weight, fillColor, strokeColor, strokeW) {
   if (!text) return;
-  // flip=true  → bottom arc: characters read right-side-up (rotate -PI/2)
-  // flip=false → top arc:    characters point outward (rotate +PI/2)
-  const midAngle = (midAngleDeg * Math.PI) / 180;
-  ctx.save();
-  ctx.font = `${weight} ${fontSize}px '${fontFamily}', cursive, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = flip ? 'top' : 'alphabetic';
-  const chars = text.split('');
-  const totalW = chars.reduce((sum, c) => sum + ctx.measureText(c).width * 1.08, 0);
+
+  // The usable arc spans from -150° to -30° (centred at -90° = top of circle)
+  // That's 120° = 2.094 radians of arc length = radius * 2.094 pixels
+  const MAX_ARC_RADIANS = (120 * Math.PI) / 180;
+  const maxArcLength    = radius * MAX_ARC_RADIANS;
+
+  // Find the largest font size where the text fits
+  let fontSize = maxFontSize;
+  ctx.font = `${weight} ${fontSize}px '${fontFamily}', sans-serif`;
+  let totalW = [...text].reduce((s, c) => s + ctx.measureText(c).width * 1.05, 0);
+
+  // Shrink font until text fits in the arc
+  while (totalW > maxArcLength && fontSize > 10) {
+    fontSize -= 1;
+    ctx.font = `${weight} ${fontSize}px '${fontFamily}', sans-serif`;
+    totalW = [...text].reduce((s, c) => s + ctx.measureText(c).width * 1.05, 0);
+  }
+
   const totalAngle = totalW / radius;
-  // For flip (bottom arc), reverse character order so text reads L→R
-  const orderedChars = flip ? [...chars].reverse() : chars;
-  const startAngle = flip
-    ? midAngle + totalAngle / 2   // start from right side, go counter-clockwise
-    : midAngle - totalAngle / 2;
-  const direction = flip ? -1 : 1;
-  let currentAngle = startAngle;
-  for (let i = 0; i < orderedChars.length; i++) {
-    const ch = orderedChars[i];
-    const cw = ctx.measureText(ch).width * 1.08;
-    const charAngle = currentAngle + direction * cw / (2 * radius);
+  // Centre the text at the top (-90° = -π/2)
+  const midAngle   = -Math.PI / 2;
+  let   angle      = midAngle - totalAngle / 2;
+
+  ctx.save();
+  for (const ch of text) {
+    const cw         = ctx.measureText(ch).width * 1.05;
+    const charAngle  = angle + cw / (2 * radius);
+
     ctx.save();
-    ctx.translate(CX + radius * Math.cos(charAngle), CY + radius * Math.sin(charAngle));
-    // Top arc: rotate so baseline faces outward (+PI/2)
-    // Bottom arc: rotate so baseline faces inward (-PI/2), text reads right-side-up
-    ctx.rotate(flip ? charAngle - Math.PI / 2 : charAngle + Math.PI / 2);
-    ctx.font = `${weight} ${fontSize}px '${fontFamily}', cursive, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = flip ? 'top' : 'alphabetic';
+    // Position at the point on the arc
+    ctx.translate(
+      CX + radius * Math.cos(charAngle),
+      CY + radius * Math.sin(charAngle)
+    );
+    // Rotate so the character's baseline faces outward (tangent to circle, upright)
+    ctx.rotate(charAngle + Math.PI / 2);
+
+    ctx.font = `${weight} ${fontSize}px '${fontFamily}', sans-serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'alphabetic';
+
     if (strokeColor && strokeColor !== 'none') {
       ctx.strokeStyle = strokeColor;
-      ctx.lineWidth = strokeW * 2;
-      ctx.lineJoin = 'round';
+      ctx.lineWidth   = strokeW * 2;
+      ctx.lineJoin    = 'round';
       ctx.strokeText(ch, 0, 0);
     }
     ctx.fillStyle = fillColor;
     ctx.fillText(ch, 0, 0);
     ctx.restore();
-    currentAngle += direction * cw / radius;
+
+    angle += cw / radius;
   }
   ctx.restore();
 }
 
+// ── Main render function ───────────────────────────────────────────────────
 function renderPreview() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
@@ -1256,8 +1271,8 @@ function renderPreview() {
 
   // 2. DISC DROP SHADOW
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.6)';
-  ctx.shadowBlur = 36;
+  ctx.shadowColor   = 'rgba(0,0,0,.6)';
+  ctx.shadowBlur    = 36;
   ctx.shadowOffsetY = 10;
   ctx.beginPath();
   ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
@@ -1265,7 +1280,7 @@ function renderPreview() {
   ctx.fill();
   ctx.restore();
 
-  // 3. FULL DISC — image fills entire disc OR gray
+  // 3. FULL DISC — image fills entire disc OR gray default
   ctx.save();
   ctx.beginPath();
   ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
@@ -1291,34 +1306,25 @@ function renderPreview() {
   ctx.beginPath();
   ctx.arc(CX, CY, R_DISC, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(0,0,0,.3)';
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth   = 2.5;
   ctx.stroke();
 
-  // 4. RED RING BORDER
-  ctx.beginPath();
-  ctx.arc(CX, CY, (R_RED_OUTER + R_RED_INNER) / 2, 0, Math.PI * 2);
-  ctx.strokeStyle = '#e53e3e';
-  ctx.lineWidth = R_RED_OUTER - R_RED_INNER + 2;  // +2 for visibility
-  ctx.stroke();
-
-  // 5. SILICONE CUP DOME (base color, 3D shaded)
+  // 4. SILICONE CUP DOME (base color, 3D shaded)
   const baseColors = {
     white: { fill: '#f0f0f0', highlight: '#ffffff', shadow: '#b8b8b8', rim: '#d0d0d0', mid: '#e4e4e4' },
     black: { fill: '#1c1c1c', highlight: '#3a3a3a', shadow: '#080808', rim: '#262626', mid: '#242424' },
     pink:  { fill: '#ec4899', highlight: '#f9a8d4', shadow: '#be185d', rim: '#db2777', mid: '#f472b6' },
   };
   const bc = baseColors[currentBaseColor] || baseColors.white;
-
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.45)';
-  ctx.shadowBlur = 22;
+  ctx.shadowColor   = 'rgba(0,0,0,.45)';
+  ctx.shadowBlur    = 22;
   ctx.shadowOffsetY = 5;
   ctx.beginPath();
   ctx.arc(CX, CY, R_CUP_OUTER, 0, Math.PI * 2);
   ctx.fillStyle = bc.fill;
   ctx.fill();
   ctx.restore();
-
   const cupGrad = ctx.createRadialGradient(CX - 42, CY - 42, 6, CX, CY, R_CUP_OUTER);
   cupGrad.addColorStop(0,    bc.highlight);
   cupGrad.addColorStop(0.3,  bc.mid);
@@ -1331,13 +1337,13 @@ function renderPreview() {
   ctx.beginPath();
   ctx.arc(CX, CY, R_CUP_OUTER, 0, Math.PI * 2);
   ctx.strokeStyle = bc.rim;
-  ctx.lineWidth = 3;
+  ctx.lineWidth   = 3;
   ctx.stroke();
 
-  // 6. WHITE CENTER HOLE
+  // 5. WHITE CENTER HOLE
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,.5)';
-  ctx.shadowBlur = 14;
+  ctx.shadowBlur  = 14;
   ctx.beginPath();
   ctx.arc(CX, CY, R_HOLE, 0, Math.PI * 2);
   ctx.fillStyle = '#ffffff';
@@ -1349,20 +1355,20 @@ function renderPreview() {
   ctx.fillStyle = 'rgba(0,0,0,.35)';
   ctx.fill();
 
-  // 7. TOP ARC: "THE BARNACLE.co" — fixed, Permanent Marker, top half
-  // midAngle = -90deg (top), arc spans ~120deg
-  renderArcText('THE BARNACLE.co', R_TOP_TEXT, -90, 30, 'Permanent Marker', '800', '#111111', null, 0, false);
-
-  // 8. BOTTOM ARC: customer text — bottom half, midAngle = 90deg
+  // 6. CUSTOMER TEXT — top arc, reads L→R, stays inside disc
   const customText = document.getElementById('customText').value.trim();
   if (customText) {
     const strokeW  = parseInt(document.getElementById('strokeWidth').value) || 2;
-    const fontSize = currentTextSize === 'large' ? 42 : 32;
-    renderArcText(customText, R_BOTTOM_TEXT, 90, fontSize, currentFont, '800', currentTextColor,
-      (currentStrokeColor && currentStrokeColor !== 'none') ? currentStrokeColor : null, strokeW, true);
+    const maxSize  = currentTextSize === 'large' ? 40 : 30;
+    drawTopArcText(
+      customText, R_TEXT, maxSize,
+      currentFont, '800', currentTextColor,
+      (currentStrokeColor && currentStrokeColor !== 'none') ? currentStrokeColor : null,
+      strokeW
+    );
   }
 
-  // 9. OUTER VIGNETTE
+  // 7. OUTER VIGNETTE
   const vignette = ctx.createRadialGradient(CX, CY, R_DISC * 0.72, CX, CY, R_DISC * 1.05);
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
   vignette.addColorStop(1, 'rgba(0,0,0,.22)');
