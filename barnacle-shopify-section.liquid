@@ -1,829 +1,669 @@
-{% comment %}
-  ============================================================
-  THE BARNACLE — Shopify Liquid Landing Page Section
-  Compatible with: Dawn theme — native Shopify line item properties, zero app dependency
-  
-  HOW TO USE:
-  1. In Shopify Admin → Online Store → Themes → Dawn → Edit Code
-  2. Under "Sections", click "Add a new section" → name it "barnacle-landing"
-  3. Paste this entire file content
-  4. In your page template (or home page), add:
-       {% section 'barnacle-landing' %}
-  5. All customization fields (Base Color, Ring Pattern, Custom Text, Font Style,
-     Text Color, Reference Image) are captured as native Shopify line item
-     properties — no app required. Data appears in the order admin view,
-     order confirmation email, and any webhook payload automatically.
-  
-  SCHEMA at bottom allows customization in the Theme Editor.
-  ============================================================
-{% endcomment %}
-
-{%- assign current_product = section.settings.product -%}
-{%- if current_product == blank -%}
-  {%- assign current_product = all_products['the-barnacle-v2'] -%}
-{%- endif -%}
-{%- assign current_variant = current_product.selected_or_first_available_variant -%}
+{%- liquid
+  assign current_product = section.settings.product | default: all_products['the-barnacle-v2']
+  if current_product == blank
+    assign current_product = all_products['the-barnacle-v2']
+  endif
+  assign current_variant = current_product.selected_or_first_available_variant
+-%}
 
 <style>
-  /* ============================================================
-     HIDE DAWN HEADER, FOOTER, AND ANNOUNCEMENT BAR
-     The barnacle landing page owns 100% of the viewport.
-  ============================================================ */
-  body.barnacle-page header,
-  body.barnacle-page .shopify-section-header,
-  body.barnacle-page #shopify-section-header,
-  body.barnacle-page site-header,
-  body.barnacle-page .header-wrapper,
-  body.barnacle-page footer,
-  body.barnacle-page .footer,
-  body.barnacle-page #shopify-section-footer,
-  body.barnacle-page .shopify-section-footer,
-  body.barnacle-page .announcement-bar,
-  body.barnacle-page #shopify-section-announcement-bar,
-  body.barnacle-page .shopify-section-group-header-group {
-    display: none !important;
-  }
-  body.barnacle-page {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  body.barnacle-page main {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
+/* ============================================================
+   HIDE DAWN HEADER / FOOTER / ANNOUNCEMENT BAR
+============================================================ */
+.barnacle-page-active #shopify-section-header,
+.barnacle-page-active header.header,
+.barnacle-page-active .header-wrapper,
+.barnacle-page-active sticky-header,
+.barnacle-page-active #shopify-section-announcement-bar,
+.barnacle-page-active .announcement-bar,
+.barnacle-page-active footer.footer,
+.barnacle-page-active #shopify-section-footer,
+.barnacle-page-active .shopify-section-group-header-group {
+  display: none !important;
+}
+.barnacle-page-active #MainContent,
+.barnacle-page-active main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
 
-  /* Scoped to this section to avoid conflicts with Dawn base styles */
-  .barnacle-section * { box-sizing: border-box; }
+/* ============================================================
+   RESET
+============================================================ */
+#bl *, #bl *::before, #bl *::after { box-sizing: border-box; margin: 0; padding: 0; }
+#bl {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #fff; color: #0f172a;
+  -webkit-font-smoothing: antialiased; line-height: 1.5;
+  --navy: #0f172a; --slate: #1e293b; --mid: #475569;
+  --light: #f8fafc; --white: #ffffff;
+  --accent: #0ea5e9; --accent-dark: #0284c7;
+  --r: 12px; --shadow: 0 4px 24px rgba(15,23,42,.12);
+}
+#bl a { text-decoration: none; color: inherit; }
 
-  /* ---- HERO ---- */
-  .barnacle-hero {
-    position: relative;
-    min-height: 100vh;
-    min-height: 100svh;
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
-  }
-  .barnacle-hero__bg {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100%; height: 100%;
-    background-size: cover; background-position: center 30%;
-  }
-  .barnacle-hero__overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(15,23,42,.45) 0%, rgba(15,23,42,.55) 60%, rgba(15,23,42,.75) 100%);
-  }
-  .barnacle-hero__content {
-    position: relative; z-index: 2;
-    text-align: center; padding: 80px 24px 120px;
-    max-width: 820px; margin: 0 auto;
-  }
-  .barnacle-hero__eyebrow {
-    display: inline-block;
-    font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
-    color: #0ea5e9;
-    background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.4);
-    padding: 6px 16px; border-radius: 50px;
-    margin-bottom: 28px;
-  }
-  .barnacle-hero__title {
-    font-size: clamp(2.4rem, 6vw, 4.5rem);
-    font-weight: 900; line-height: 1.08; letter-spacing: -.02em;
-    color: #fff; margin-bottom: 24px;
-  }
-  .barnacle-hero__title em { font-style: normal; color: #0ea5e9; }
-  .barnacle-hero__sub {
-    font-size: clamp(1rem, 2.2vw, 1.2rem);
-    color: rgba(255,255,255,.82); line-height: 1.65;
-    max-width: 560px; margin: 0 auto 44px;
-  }
-  .barnacle-hero__ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-  .barnacle-btn-primary {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    background: #0ea5e9; color: #fff;
-    font-size: 1rem; font-weight: 700;
-    padding: 16px 36px; border-radius: 50px; border: none; cursor: pointer;
-    transition: background .2s, transform .15s;
-    box-shadow: 0 4px 20px rgba(14,165,233,.35);
-    text-decoration: none;
-  }
-  .barnacle-btn-primary:hover { background: #0284c7; transform: translateY(-2px); }
-  .barnacle-btn-outline {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: transparent; color: #fff;
-    font-size: 1rem; font-weight: 700;
-    padding: 14px 32px; border-radius: 50px;
-    border: 2px solid rgba(255,255,255,.6); cursor: pointer;
-    transition: background .2s; text-decoration: none;
-  }
-  .barnacle-btn-outline:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+/* ============================================================
+   BUTTONS
+============================================================ */
+#bl .btn-p {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--accent); color: #fff;
+  font-size: 1rem; font-weight: 700; letter-spacing: .02em;
+  padding: 16px 36px; border-radius: 50px; border: none; cursor: pointer;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  box-shadow: 0 4px 20px rgba(14,165,233,.35); white-space: nowrap;
+  text-decoration: none; font-family: inherit;
+}
+#bl .btn-p:hover { background: var(--accent-dark); transform: translateY(-2px); }
+#bl .btn-o {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent; color: #fff; font-size: 1rem; font-weight: 700;
+  padding: 14px 32px; border-radius: 50px; border: 2px solid rgba(255,255,255,.6);
+  cursor: pointer; transition: background .2s, border-color .2s; text-decoration: none;
+}
+#bl .btn-o:hover { background: rgba(255,255,255,.12); border-color: #fff; }
 
-  /* ---- BUY SECTION ---- */
-  .barnacle-buy { padding: 96px 0; background: #fff; }
-  .barnacle-buy__grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
-    max-width: 1200px; margin: 0 auto; padding: 0 24px;
-  }
-  .barnacle-gallery__main {
-    border-radius: 12px; overflow: hidden; aspect-ratio: 1/1;
-    background: #f8fafc; cursor: zoom-in;
-  }
-  .barnacle-gallery__main img { width: 100%; height: 100%; object-fit: cover; transition: opacity .18s; }
-  .barnacle-gallery__thumbs { display: flex; gap: 10px; margin-top: 12px; }
-  .barnacle-gallery__thumb {
-    width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
-    border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: #f8fafc;
-    transition: border-color .2s;
-  }
-  .barnacle-gallery__thumb.active, .barnacle-gallery__thumb:hover { border-color: #0ea5e9; }
-  .barnacle-gallery__thumb img { width: 100%; height: 100%; object-fit: cover; }
+/* ============================================================
+   HERO
+============================================================ */
+#bl #hero {
+  position: relative; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+#bl .hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: hidden;
+}
+#bl .hero-bg img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 60%; display: block;
+}
+#bl .hero-ov {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(10,18,35,.35) 0%, rgba(10,18,35,.52) 55%, rgba(10,18,35,.78) 100%);
+}
+#bl .hero-wm {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; overflow: hidden;
+}
+#bl .hero-wm span {
+  font-size: clamp(5rem, 18vw, 16rem); font-weight: 900; letter-spacing: -.04em;
+  line-height: .9; text-align: center; color: transparent;
+  -webkit-text-stroke: 2px rgba(255,255,255,.1); text-transform: uppercase;
+  white-space: nowrap; user-select: none; font-family: 'Permanent Marker', cursive;
+}
+#bl .hero-content {
+  position: relative; z-index: 2;
+  text-align: center; padding: 80px 24px 120px; max-width: 820px;
+}
+#bl .eyebrow {
+  display: inline-block; font-size: .75rem; font-weight: 700; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--accent);
+  background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.4);
+  padding: 6px 16px; border-radius: 50px; margin-bottom: 28px;
+}
+#bl #hero h1 {
+  font-size: clamp(2.6rem, 6.5vw, 5rem); font-weight: 900; line-height: 1.06;
+  letter-spacing: -.025em; color: #fff; margin-bottom: 24px;
+}
+#bl #hero h1 em { font-style: normal; color: var(--accent); }
+#bl .hero-sub {
+  font-size: clamp(1rem, 2.2vw, 1.2rem); color: rgba(255,255,255,.82);
+  line-height: 1.65; max-width: 560px; margin: 0 auto 44px;
+}
+#bl .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+#bl .scroll-hint {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  z-index: 2; color: rgba(255,255,255,.45); font-size: .7rem; letter-spacing: .1em;
+  text-transform: uppercase; display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+#bl .scroll-hint span { animation: bl-bounce 2s infinite; display: block; }
+@keyframes bl-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
 
-  .barnacle-product__label {
-    font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-    color: #0ea5e9; margin-bottom: 10px;
-  }
-  .barnacle-product__title {
-    font-size: clamp(2rem, 3.5vw, 3rem);
-    font-weight: 900; letter-spacing: -.03em; color: #0f172a; margin-bottom: 16px;
-  }
-  .barnacle-product__tagline { font-size: 1.05rem; color: #475569; line-height: 1.6; margin-bottom: 28px; }
-  .barnacle-price-block { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
-  .barnacle-price { font-size: 2.2rem; font-weight: 900; color: #0f172a; }
-  .barnacle-price-note { font-size: .85rem; color: #475569; }
+/* ============================================================
+   CONTAINER
+============================================================ */
+#bl .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-  /* ---- CUSTOMIZER ---- */
-  .barnacle-customizer {
-    background: #f8fafc; border-radius: 16px;
-    padding: 24px 28px; margin-bottom: 28px;
-    border: 1px solid #e2e8f0;
-  }
-  .barnacle-customizer__header {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-  }
-  .barnacle-customizer__label {
-    font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-    color: #475569;
-  }
-  .barnacle-customizer__badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: .68rem; font-weight: 600; color: #16a34a;
-    background: #dcfce7; border-radius: 50px; padding: 3px 10px;
-  }
-  .barnacle-customizer__badge::before { content: '●'; font-size: .55rem; }
-  .barnacle-field { margin-bottom: 20px; }
-  .barnacle-field:last-child { margin-bottom: 0; }
-  .barnacle-field__label {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: .78rem; font-weight: 700; color: #0f172a; margin-bottom: 10px;
-  }
-  .barnacle-field__selected {
-    font-size: .75rem; font-weight: 500; color: #0ea5e9;
-  }
-  /* Swatch grid */
-  .barnacle-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
-  .barnacle-swatch {
-    position: relative; width: 40px; height: 40px;
-    border-radius: 50%; border: 3px solid transparent;
-    cursor: pointer; transition: border-color .15s, transform .15s;
-    outline: none;
-  }
-  .barnacle-swatch:hover { transform: scale(1.1); }
-  .barnacle-swatch.selected { border-color: #0ea5e9; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0ea5e9; }
-  .barnacle-swatch input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
-  .barnacle-swatch__dot {
-    width: 100%; height: 100%; border-radius: 50%;
-    border: 1px solid rgba(0,0,0,.12);
-  }
-  /* Pattern swatches (larger, rectangular) */
-  .barnacle-pattern-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
-  .barnacle-pattern-swatch {
-    position: relative; padding: 8px 16px;
-    border-radius: 8px; border: 2px solid #e2e8f0;
-    cursor: pointer; transition: border-color .15s, background .15s;
-    font-size: .8rem; font-weight: 600; color: #475569;
-    background: #fff;
-  }
-  .barnacle-pattern-swatch:hover { border-color: #94a3b8; color: #0f172a; }
-  .barnacle-pattern-swatch.selected { border-color: #0ea5e9; background: rgba(14,165,233,.06); color: #0ea5e9; }
-  .barnacle-pattern-swatch input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
-  /* Text input */
-  .barnacle-text-input {
-    width: 100%; padding: 12px 16px;
-    border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: .95rem; color: #0f172a; background: #fff;
-    outline: none; transition: border-color .15s;
-    font-family: inherit;
-  }
-  .barnacle-text-input:focus { border-color: #0ea5e9; }
-  .barnacle-text-input::placeholder { color: #94a3b8; }
-  .barnacle-char-count { font-size: .7rem; color: #94a3b8; text-align: right; margin-top: 4px; }
-  .barnacle-char-count.warn { color: #f59e0b; }
-  /* Font picker */
-  .barnacle-font-options { display: flex; flex-wrap: wrap; gap: 8px; }
-  .barnacle-font-option {
-    position: relative; padding: 10px 18px;
-    border-radius: 8px; border: 2px solid #e2e8f0;
-    cursor: pointer; transition: border-color .15s, background .15s;
-    font-size: .95rem; color: #475569; background: #fff;
-  }
-  .barnacle-font-option:hover { border-color: #94a3b8; }
-  .barnacle-font-option.selected { border-color: #0ea5e9; background: rgba(14,165,233,.06); color: #0f172a; }
-  .barnacle-font-option input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
-  .barnacle-font-block { font-family: 'Impact', 'Arial Black', sans-serif; font-weight: 900; }
-  .barnacle-font-script { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
-  .barnacle-font-military { font-family: 'Courier New', 'Courier', monospace; font-weight: 700; letter-spacing: .05em; }
-  .barnacle-font-sans { font-family: 'Arial', 'Helvetica', sans-serif; font-weight: 600; }
-  /* Image reference */
-  .barnacle-img-ref {
-    width: 100%; padding: 12px 16px;
-    border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: .9rem; color: #0f172a; background: #fff;
-    outline: none; transition: border-color .15s;
-    font-family: inherit;
-  }
-  .barnacle-img-ref:focus { border-color: #0ea5e9; }
-  .barnacle-img-ref::placeholder { color: #94a3b8; }
-  .barnacle-field__hint { font-size: .72rem; color: #94a3b8; margin-top: 5px; }
+/* ============================================================
+   FEATURES SECTION
+============================================================ */
+#bl #features { padding: 96px 0; background: var(--light); }
+#bl .sec-head { text-align: center; margin-bottom: 72px; }
+#bl .sec-eye { font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+#bl .sec-title { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; letter-spacing: -.025em; color: var(--navy); max-width: 680px; margin: 0 auto 16px; }
+#bl .sec-sub { font-size: 1rem; color: var(--mid); max-width: 520px; margin: 0 auto; line-height: 1.65; }
 
-  .barnacle-features { list-style: none; margin-bottom: 36px; display: flex; flex-direction: column; gap: 14px; }
-  .barnacle-features li { display: flex; align-items: flex-start; gap: 12px; font-size: .95rem; color: #1e293b; line-height: 1.5; }
-  .barnacle-feat-icon {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: rgba(14,165,233,.1); flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 1rem;
-  }
-  .barnacle-features strong { display: block; font-weight: 700; color: #0f172a; }
+#bl .pain-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-bottom: 80px; }
+#bl .pain-card { background: #fff; border-radius: var(--r); padding: 32px 28px; box-shadow: var(--shadow); }
+#bl .pain-icon { font-size: 2rem; margin-bottom: 16px; }
+#bl .pain-card h3 { font-size: 1.05rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+#bl .pain-card p { font-size: .9rem; color: var(--mid); line-height: 1.65; }
 
-  /* Shopify product form — Optus hooks into this standard form */
-  .barnacle-product-form { display: flex; flex-direction: column; gap: 12px; }
-  .barnacle-atc-btn {
-    width: 100%; padding: 18px 24px;
-    font-size: 1.05rem; font-weight: 800;
-    background: #0f172a; color: #fff;
-    border: none; border-radius: 50px; cursor: pointer;
-    transition: background .2s, transform .15s;
-    box-shadow: 0 4px 20px rgba(15,23,42,.25);
-  }
-  .barnacle-atc-btn:hover { background: #1e293b; transform: translateY(-2px); }
-  .barnacle-trust { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-size: .78rem; color: #475569; margin-top: 4px; }
-  .barnacle-trust span { display: flex; align-items: center; gap: 5px; }
+#bl .feat-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  overflow: hidden; border-radius: var(--r); box-shadow: var(--shadow); margin-bottom: 40px;
+}
+#bl .feat-row:last-child { margin-bottom: 0; }
+#bl .feat-row.rev { direction: rtl; }
+#bl .feat-row.rev > * { direction: ltr; }
+#bl .feat-img { aspect-ratio: 4/5; overflow: hidden; }
+#bl .feat-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; display: block; }
+#bl .feat-img:hover img { transform: scale(1.04); }
+#bl .feat-text { background: #fff; display: flex; flex-direction: column; justify-content: center; padding: 56px 52px; }
+#bl .ft-eye { font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+#bl .feat-text h3 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 900; letter-spacing: -.02em; color: var(--navy); line-height: 1.15; margin-bottom: 18px; }
+#bl .feat-text p { font-size: 1rem; color: var(--mid); line-height: 1.7; }
+#bl .feat-pill { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700; color: var(--navy); background: var(--light); border-radius: 50px; padding: 6px 14px; margin-top: 24px; align-self: flex-start; }
 
-  /* ---- FEATURE GRID ---- */
-  .barnacle-features-section { padding: 96px 0; background: #f8fafc; }
-  .barnacle-features-section .inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .barnacle-section-header { text-align: center; margin-bottom: 72px; }
-  .barnacle-section-eyebrow {
-    font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
-    color: #0ea5e9; margin-bottom: 14px;
-  }
-  .barnacle-section-title {
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    font-weight: 900; letter-spacing: -.025em; color: #0f172a;
-    max-width: 600px; margin: 0 auto;
-  }
-  .barnacle-feature-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    overflow: hidden; border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(15,23,42,.12);
-    margin-bottom: 40px;
-  }
-  .barnacle-feature-row.reverse { direction: rtl; }
-  .barnacle-feature-row.reverse > * { direction: ltr; }
-  .barnacle-feature-img { aspect-ratio: 4/5; overflow: hidden; }
-  .barnacle-feature-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
-  .barnacle-feature-img:hover img { transform: scale(1.04); }
-  .barnacle-feature-text {
-    background: #fff; display: flex; flex-direction: column; justify-content: center;
-    padding: 56px 52px;
-  }
-  .barnacle-ft-eyebrow {
-    font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-    color: #0ea5e9; margin-bottom: 16px;
-  }
-  .barnacle-ft-title {
-    font-size: clamp(1.4rem, 2.5vw, 2rem);
-    font-weight: 900; letter-spacing: -.02em; color: #0f172a;
-    line-height: 1.15; margin-bottom: 18px;
-  }
-  .barnacle-ft-body { font-size: 1rem; color: #475569; line-height: 1.7; }
-  .barnacle-feat-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: .78rem; font-weight: 700; color: #0f172a;
-    background: #f8fafc; border-radius: 50px; padding: 6px 14px; margin-top: 24px; align-self: flex-start;
-  }
+/* ============================================================
+   BUY SECTION
+============================================================ */
+#bl #buy { padding: 96px 0; background: #fff; }
+#bl .buy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
 
-  /* ---- STICKY BAR ---- */
-  .barnacle-sticky {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
-    background: #0f172a; padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    box-shadow: 0 -4px 24px rgba(15,23,42,.25);
-    transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
-  }
-  .barnacle-sticky.visible { transform: translateY(0); }
-  .barnacle-sticky__name { font-size: .85rem; font-weight: 800; color: #fff; }
-  .barnacle-sticky__price { font-size: .8rem; color: rgba(255,255,255,.6); }
-  .barnacle-sticky__btn {
-    flex-shrink: 0; background: #0ea5e9; color: #fff;
-    font-size: .85rem; font-weight: 800;
-    padding: 12px 28px; border-radius: 50px; border: none; cursor: pointer;
-    transition: background .2s;
-  }
-  .barnacle-sticky__btn:hover { background: #0284c7; }
+#bl .gal-main { border-radius: var(--r); overflow: hidden; aspect-ratio: 1/1; background: var(--light); cursor: zoom-in; }
+#bl .gal-main img { width: 100%; height: 100%; object-fit: cover; transition: opacity .18s; display: block; }
+#bl .gal-thumbs { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+#bl .gal-thumb { width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: var(--light); transition: border-color .2s; }
+#bl .gal-thumb.active, #bl .gal-thumb:hover { border-color: var(--accent); }
+#bl .gal-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  /* ---- FOOTER ---- */
-  .barnacle-footer { background: #0f172a; padding: 64px 0 32px; color: rgba(255,255,255,.6); }
-  .barnacle-footer__inner {
-    max-width: 1200px; margin: 0 auto; padding: 0 24px;
-    display: flex; flex-direction: column; align-items: center; gap: 40px; text-align: center;
-  }
-  .barnacle-footer__brand { font-size: 1.4rem; font-weight: 900; color: #fff; }
-  .barnacle-footer__brand span { color: #0ea5e9; }
-  .barnacle-footer__email { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .barnacle-footer__email input {
-    padding: 12px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2);
-    background: rgba(255,255,255,.08); color: #fff; font-size: .9rem; min-width: 260px; outline: none;
-  }
-  .barnacle-footer__email input::placeholder { color: rgba(255,255,255,.4); }
-  .barnacle-footer__email button {
-    padding: 12px 28px; border-radius: 50px; border: none;
-    background: #0ea5e9; color: #fff; font-size: .9rem; font-weight: 700; cursor: pointer;
-  }
-  .barnacle-footer__links { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; font-size: .8rem; }
-  .barnacle-footer__links a { color: rgba(255,255,255,.5); text-decoration: none; }
-  .barnacle-footer__links a:hover { color: #fff; }
-  .barnacle-footer__copy { font-size: .75rem; color: rgba(255,255,255,.3); }
+#bl .prod-label { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+#bl .prod-title { font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 900; letter-spacing: -.03em; color: var(--navy); margin-bottom: 16px; }
+#bl .prod-tag { font-size: 1.05rem; color: var(--mid); line-height: 1.6; margin-bottom: 20px; }
+#bl .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; }
+#bl .price { font-size: 2.2rem; font-weight: 900; color: var(--navy); }
+#bl .price-note { font-size: .85rem; color: var(--mid); }
+#bl .feat-list { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+#bl .feat-list li { display: flex; align-items: flex-start; gap: 12px; font-size: .92rem; color: var(--slate); line-height: 1.5; }
+#bl .feat-list strong { display: block; font-weight: 700; color: var(--navy); }
+#bl .fi { width: 34px; height: 34px; border-radius: 8px; background: rgba(14,165,233,.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+#bl .atc-btn { width: 100%; padding: 18px 24px; font-size: 1.05rem; font-weight: 800; letter-spacing: .02em; background: var(--navy); color: #fff; border: none; border-radius: 50px; cursor: pointer; transition: background .2s, transform .15s, box-shadow .2s; box-shadow: 0 4px 20px rgba(15,23,42,.25); font-family: inherit; }
+#bl .atc-btn:hover { background: var(--slate); transform: translateY(-2px); }
+#bl .trust-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-size: .78rem; color: var(--mid); margin-top: 10px; }
+#bl .trust-row span { display: flex; align-items: center; gap: 5px; }
 
-  /* ---- RESPONSIVE ---- */
-  @media (max-width: 900px) {
-    .barnacle-buy__grid { grid-template-columns: 1fr; gap: 40px; }
-    .barnacle-feature-row { grid-template-columns: 1fr; }
-    .barnacle-feature-row.reverse { direction: ltr; }
-    .barnacle-feature-img { aspect-ratio: 16/9; }
-    .barnacle-feature-text { padding: 40px 32px; }
-  }
-  @media (max-width: 600px) {
-    .barnacle-buy { padding: 64px 0; }
-    .barnacle-features-section { padding: 64px 0; }
-    .barnacle-feature-text { padding: 32px 24px; }
-    .barnacle-sticky { padding: 12px 16px; }
-  }
+/* ============================================================
+   CONFIGURATOR SECTION
+============================================================ */
+#bl #cfg { padding: 96px 0; background: var(--navy); }
+#bl #cfg .sec-head { margin-bottom: 64px; }
+#bl #cfg .sec-title { color: #fff; }
+#bl #cfg .sec-sub { color: rgba(255,255,255,.6); }
+#bl .cfg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+#bl .cfg-preview-wrap { position: sticky; top: 24px; }
+#bl .cfg-preview-lbl { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 16px; text-align: center; }
+#bl .cfg-canvas-wrap { position: relative; border-radius: 20px; overflow: hidden; background: #1a1008; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 48px rgba(0,0,0,.5); }
+#bl #previewCanvas { width: 100%; height: 100%; border-radius: 20px; }
+#bl .preview-badge { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px; font-size: .7rem; font-weight: 700; color: #16a34a; background: rgba(22,163,74,.15); border: 1px solid rgba(22,163,74,.3); border-radius: 50px; padding: 5px 14px; white-space: nowrap; }
+#bl .preview-badge::before { content: '\25CF'; font-size: .55rem; }
+#bl .cfg-controls { display: flex; flex-direction: column; gap: 32px; }
+#bl .cfg-grp-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+#bl .cfg-grp-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+#bl .base-swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+#bl .b-swatch { width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; }
+#bl .b-swatch:hover { transform: scale(1.12); }
+#bl .b-swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,165,233,.3); }
+#bl .b-swatch[data-c="white"] { background: #f8fafc; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+#bl .b-swatch[data-c="black"] { background: #1a1a1a; }
+#bl .b-swatch[data-c="pink"]  { background: #ec4899; }
+#bl .sw-lbl { font-size: .75rem; color: rgba(255,255,255,.5); margin-top: 6px; text-align: center; }
+#bl .upload-zone { border: 2px dashed rgba(255,255,255,.2); border-radius: var(--r); padding: 28px 20px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; position: relative; overflow: hidden; }
+#bl .upload-zone:hover, #bl .upload-zone.drag-over { border-color: var(--accent); background: rgba(14,165,233,.05); }
+#bl .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#bl .upload-icon { font-size: 2rem; margin-bottom: 10px; }
+#bl .upload-title { font-size: .9rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+#bl .upload-sub { font-size: .78rem; color: rgba(255,255,255,.4); }
+#bl .upload-strip { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+#bl .upload-thumb { width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255,255,255,.15); cursor: pointer; flex-shrink: 0; transition: border-color .2s; }
+#bl .upload-thumb.active { border-color: var(--accent); }
+#bl .upload-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#bl .preset-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+#bl .preset-btn { padding: 7px 14px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.05); color: rgba(255,255,255,.7); font-size: .78rem; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s, color .2s; font-family: inherit; }
+#bl .preset-btn:hover, #bl .preset-btn.active { background: rgba(14,165,233,.15); border-color: var(--accent); color: #fff; }
+#bl .cfg-input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; color: #fff; font-size: .95rem; outline: none; transition: border-color .2s; font-family: inherit; }
+#bl .cfg-input::placeholder { color: rgba(255,255,255,.3); }
+#bl .cfg-input:focus { border-color: var(--accent); }
+#bl .sz-btns { display: flex; gap: 10px; }
+#bl .sz-btn { padding: 8px 20px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,.2); background: transparent; color: rgba(255,255,255,.6); font-size: .82rem; font-weight: 600; cursor: pointer; transition: all .18s; font-family: inherit; }
+#bl .sz-btn.active, #bl .sz-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+#bl .font-wrap { position: relative; }
+#bl .font-trigger { width: 100%; padding: 13px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; color: #fff; font-size: .95rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s; font-family: inherit; }
+#bl .font-trigger:hover { border-color: rgba(255,255,255,.3); }
+#bl .font-trigger.open { border-color: var(--accent); border-radius: 10px 10px 0 0; }
+#bl .font-trigger .chev { transition: transform .2s; font-size: .7rem; }
+#bl .font-trigger.open .chev { transform: rotate(180deg); }
+#bl .font-dd { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: #1e293b; border: 1px solid rgba(255,255,255,.15); border-top: none; border-radius: 0 0 10px 10px; max-height: 260px; overflow-y: auto; display: none; }
+#bl .font-dd.open { display: block; }
+#bl .font-search-wrap { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+#bl .font-search-wrap input { width: 100%; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 7px 12px; color: #fff; font-size: .85rem; outline: none; font-family: inherit; }
+#bl .font-search-wrap input::placeholder { color: rgba(255,255,255,.3); }
+#bl .font-opt { padding: 11px 16px; cursor: pointer; font-size: .9rem; color: rgba(255,255,255,.8); transition: background .15s; display: flex; align-items: center; justify-content: space-between; }
+#bl .font-opt:hover { background: rgba(255,255,255,.06); }
+#bl .font-opt.sel { color: var(--accent); background: rgba(14,165,233,.08); }
+#bl .font-opt .fp { font-size: 1rem; color: rgba(255,255,255,.5); }
+#bl .stroke-row { display: flex; align-items: center; gap: 14px; }
+#bl .stroke-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+#bl .stroke-val { font-size: .8rem; color: rgba(255,255,255,.6); min-width: 28px; text-align: right; }
+#bl .cfg-cta { width: 100%; padding: 18px 24px; font-size: 1rem; font-weight: 800; background: var(--accent); color: #fff; border: none; border-radius: 50px; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 4px 20px rgba(14,165,233,.35); font-family: inherit; }
+#bl .cfg-cta:hover { background: var(--accent-dark); transform: translateY(-2px); }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+#bl #bl-footer { background: var(--navy); padding: 64px 0 40px; color: rgba(255,255,255,.6); }
+#bl .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
+#bl .footer-brand { font-size: 1.4rem; font-weight: 900; letter-spacing: -.02em; color: #fff; }
+#bl .footer-brand span { color: var(--accent); }
+#bl .footer-links { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; font-size: .8rem; }
+#bl .footer-links a { color: rgba(255,255,255,.5); transition: color .2s; }
+#bl .footer-links a:hover { color: #fff; }
+#bl .footer-copy { font-size: .75rem; color: rgba(255,255,255,.3); }
+
+/* ============================================================
+   STICKY BAR
+============================================================ */
+#bl-sticky {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+  background: #0f172a; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  box-shadow: 0 -4px 24px rgba(15,23,42,.25);
+  transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+#bl-sticky.vis { transform: translateY(0); }
+#bl-sticky .sn { font-size: .85rem; font-weight: 800; color: #fff; }
+#bl-sticky .sp { font-size: .8rem; color: rgba(255,255,255,.6); }
+#bl-sticky .sb { flex-shrink: 0; background: #0ea5e9; color: #fff; font-size: .85rem; font-weight: 800; padding: 12px 28px; border-radius: 50px; border: none; cursor: pointer; transition: background .2s; font-family: inherit; }
+#bl-sticky .sb:hover { background: #0284c7; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 900px) {
+  #bl .pain-grid { grid-template-columns: 1fr; }
+  #bl .buy-grid { grid-template-columns: 1fr; gap: 40px; }
+  #bl .cfg-layout { grid-template-columns: 1fr; gap: 40px; }
+  #bl .cfg-preview-wrap { position: static; }
+  #bl .feat-row { grid-template-columns: 1fr; }
+  #bl .feat-row.rev { direction: ltr; }
+  #bl .feat-img { aspect-ratio: 16/9; }
+  #bl .feat-text { padding: 40px 32px; }
+}
+@media (max-width: 600px) {
+  #bl #buy, #bl #features, #bl #cfg { padding: 64px 0; }
+  #bl .feat-text { padding: 32px 24px; }
+  #bl-sticky { padding: 12px 16px; }
+  #bl .gal-thumb { width: 60px; height: 60px; }
+}
 </style>
 
-<!-- HERO -->
-<section class="barnacle-hero" id="barnacle-hero">
-  <div class="barnacle-hero__bg" style="background-image:url('https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/hero-hydro-wide.png?v=1774008255')"></div>
-  <div class="barnacle-hero__overlay"></div>
-  <div class="barnacle-hero__content">
-    <div class="barnacle-hero__eyebrow">The Barnacle &mdash; Portable Beverage Holder</div>
-    <h1 class="barnacle-hero__title">
-      {{ section.settings.hero_headline | default: 'Built for boats, <em>perfected</em> for everywhere else.' }}
-    </h1>
-    <p class="barnacle-hero__sub">
-      {{ section.settings.hero_subheadline | default: 'The portable, multi-use beverage holder designed to fit cans and cups of all sizes. Secure your drink on the water, on the trail, or on the tailgate.' }}
-    </p>
-    <div class="barnacle-hero__ctas">
-      <a href="#barnacle-buy" class="barnacle-btn-primary">Get Your Barnacle</a>
-      <a href="#barnacle-features" class="barnacle-btn-outline">See It In Action</a>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet" />
+
+<div id="bl">
+
+<!-- ====== HERO ====== -->
+<section id="hero">
+  <div class="hero-bg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/hero-hydro-wide.png" alt="The Barnacle lifestyle" fetchpriority="high" /></div>
+  <div class="hero-ov"></div>
+  <div class="hero-wm"><span>Barnacle</span></div>
+  <div class="hero-content">
+    <div class="eyebrow">The Barnacle &mdash; Portable Beverage Holder</div>
+    <h1>Your drink's new<br><em>best friend.</em></h1>
+    <p class="hero-sub">The portable, multi-use beverage holder that grips any flat surface &mdash; on the water, on the road, or wherever the day takes you.</p>
+    <div class="hero-ctas">
+      <a href="#buy" class="btn-p">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Get Your Barnacle
+      </a>
+      <a href="#features" class="btn-o">Learn More</a>
     </div>
   </div>
+  <div class="scroll-hint"><span>&#8595;</span></div>
 </section>
 
-<!-- BUY / PRODUCT SECTION -->
-<section class="barnacle-buy" id="barnacle-buy">
-  <div class="barnacle-buy__grid">
-
-    <!-- Gallery -->
-    <div class="barnacle-gallery">
-      <div class="barnacle-gallery__main">
-        <img id="barnacle-main-img"
-          src="{{ current_product.featured_image | image_url: width: 800 }}"
-          alt="{{ current_product.featured_image.alt | escape }}" />
+<!-- ====== FEATURES ====== -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Tired of having nowhere to put your drink?</h2>
+      <p class="sec-sub">Every flat surface is a cup holder now. The Barnacle sticks, grips, and holds &mdash; so you can stop worrying about your drink and start enjoying the moment.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">&#127754;</div>
+        <h3>Boats have zero cup holders</h3>
+        <p>You're out on the water, waves are rolling, and your drink is sliding across the deck. The Barnacle fixes that permanently &mdash; no drilling, no installation.</p>
       </div>
-      <div class="barnacle-gallery__thumbs" id="barnacle-thumbs">
-        {%- for image in current_product.images limit: 5 -%}
-        <div class="barnacle-gallery__thumb{% if forloop.first %} active{% endif %}"
-          data-src="{{ image | image_url: width: 800 }}">
-          <img src="{{ image | image_url: width: 150 }}" alt="{{ image.alt | escape }}" />
-        </div>
-        {%- endfor -%}
+      <div class="pain-card">
+        <div class="pain-icon">&#128663;</div>
+        <h3>Flat surfaces everywhere, zero grip</h3>
+        <p>Truck dash, cooler lid, kayak deck, tailgate rail &mdash; none of them hold your drink. Until now. The Barnacle's suction base grips any smooth flat surface.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">&#129380;</div>
+        <h3>Works with everything you drink from</h3>
+        <p>12 oz cans, 20 oz bottles, 30 oz tumblers, 40 oz Stanleys &mdash; the flexible silicone ring expands and contracts to hold virtually any drink securely.</p>
       </div>
     </div>
-
-    <!-- Conversion Column -->
-    <div class="barnacle-product-info">
-      <div class="barnacle-product__label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
-      <h2 class="barnacle-product__title">{{ current_product.title }}</h2>
-      <p class="barnacle-product__tagline">{{ section.settings.product_tagline | default: "Your drink's new best friend — on the water, on the road, or at the tailgate." }}</p>
-
-      <div class="barnacle-price-block">
-        <span class="barnacle-price">{{ current_variant.price | money }}</span>
-        <span class="barnacle-price-note">USD &bull; Free returns</span>
+    <div class="feat-row">
+      <div class="feat-img"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp" alt="Tumbler in The Barnacle on a pier" loading="lazy" /></div>
+      <div class="feat-text">
+        <div class="ft-eye">On The Water</div>
+        <h3>Built for the dock, the boat, and the open water.</h3>
+        <p>Whether you're anchored in the bay or ripping through the wake, The Barnacle keeps your tumbler locked in place. UV-resistant, waterproof, and built to handle salt air and spray all day long.</p>
+        <div class="feat-pill">&#9875; Boat-tested, water-approved</div>
       </div>
-
-      <!-- CUSTOMIZER — Native Shopify line item properties, zero app dependency -->
-      <div class="barnacle-customizer" id="barnacle-customizer">
-        <div class="barnacle-customizer__header">
-          <div class="barnacle-customizer__label">Customize Your Barnacle</div>
-          <div class="barnacle-customizer__badge">Live Preview</div>
-        </div>
-
-        <!-- BASE COLOR -->
-        <div class="barnacle-field" id="field-base-color">
-          <div class="barnacle-field__label">
-            <span>Base Color</span>
-            <span class="barnacle-field__selected" id="selected-base-color">Black</span>
-          </div>
-          <div class="barnacle-swatches">
-            <label class="barnacle-swatch selected" title="Black" data-field="base-color" data-value="Black">
-              <input type="radio" name="barnacle_base_color" value="Black" checked />
-              <div class="barnacle-swatch__dot" style="background:#1a1a1a;"></div>
-            </label>
-            <label class="barnacle-swatch" title="White" data-field="base-color" data-value="White">
-              <input type="radio" name="barnacle_base_color" value="White" />
-              <div class="barnacle-swatch__dot" style="background:#f8fafc;"></div>
-            </label>
-            <label class="barnacle-swatch" title="Navy" data-field="base-color" data-value="Navy">
-              <input type="radio" name="barnacle_base_color" value="Navy" />
-              <div class="barnacle-swatch__dot" style="background:#1e3a5f;"></div>
-            </label>
-            <label class="barnacle-swatch" title="OD Green" data-field="base-color" data-value="OD Green">
-              <input type="radio" name="barnacle_base_color" value="OD Green" />
-              <div class="barnacle-swatch__dot" style="background:#4a5c3a;"></div>
-            </label>
-            <label class="barnacle-swatch" title="Tan" data-field="base-color" data-value="Tan">
-              <input type="radio" name="barnacle_base_color" value="Tan" />
-              <div class="barnacle-swatch__dot" style="background:#c4a882;"></div>
-            </label>
-            <label class="barnacle-swatch" title="Red" data-field="base-color" data-value="Red">
-              <input type="radio" name="barnacle_base_color" value="Red" />
-              <div class="barnacle-swatch__dot" style="background:#c0392b;"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- RING PATTERN -->
-        <div class="barnacle-field" id="field-ring-pattern">
-          <div class="barnacle-field__label">
-            <span>Ring Pattern</span>
-            <span class="barnacle-field__selected" id="selected-ring-pattern">Solid</span>
-          </div>
-          <div class="barnacle-pattern-swatches">
-            <label class="barnacle-pattern-swatch selected" data-field="ring-pattern" data-value="Solid">
-              <input type="radio" name="barnacle_ring_pattern" value="Solid" checked />
-              Solid
-            </label>
-            <label class="barnacle-pattern-swatch" data-field="ring-pattern" data-value="Stripe">
-              <input type="radio" name="barnacle_ring_pattern" value="Stripe" />
-              Stripe
-            </label>
-            <label class="barnacle-pattern-swatch" data-field="ring-pattern" data-value="Camo">
-              <input type="radio" name="barnacle_ring_pattern" value="Camo" />
-              Camo
-            </label>
-            <label class="barnacle-pattern-swatch" data-field="ring-pattern" data-value="Custom">
-              <input type="radio" name="barnacle_ring_pattern" value="Custom" />
-              Custom
-            </label>
-          </div>
-        </div>
-
-        <!-- CUSTOM TEXT -->
-        <div class="barnacle-field" id="field-custom-text">
-          <div class="barnacle-field__label">
-            <span>Custom Text <span style="font-weight:400;color:#94a3b8;">(optional)</span></span>
-          </div>
-          <input
-            type="text"
-            class="barnacle-text-input"
-            id="barnacle-custom-text"
-            placeholder="e.g. SEMPER FI, LAKE LIFE, your name..."
-            maxlength="20"
-            autocomplete="off"
-          />
-          <div class="barnacle-char-count" id="barnacle-char-count">0 / 20 characters</div>
-        </div>
-
-        <!-- FONT STYLE -->
-        <div class="barnacle-field" id="field-font-style">
-          <div class="barnacle-field__label">
-            <span>Font Style</span>
-            <span class="barnacle-field__selected" id="selected-font-style">Block</span>
-          </div>
-          <div class="barnacle-font-options">
-            <label class="barnacle-font-option barnacle-font-block selected" data-field="font-style" data-value="Block">
-              <input type="radio" name="barnacle_font_style" value="Block" checked />
-              Block
-            </label>
-            <label class="barnacle-font-option barnacle-font-script" data-field="font-style" data-value="Script">
-              <input type="radio" name="barnacle_font_style" value="Script" />
-              Script
-            </label>
-            <label class="barnacle-font-option barnacle-font-military" data-field="font-style" data-value="Military">
-              <input type="radio" name="barnacle_font_style" value="Military" />
-              Military
-            </label>
-            <label class="barnacle-font-option barnacle-font-sans" data-field="font-style" data-value="Sans">
-              <input type="radio" name="barnacle_font_style" value="Sans" />
-              Sans
-            </label>
-          </div>
-        </div>
-
-        <!-- TEXT COLOR -->
-        <div class="barnacle-field" id="field-text-color">
-          <div class="barnacle-field__label">
-            <span>Text Color</span>
-            <span class="barnacle-field__selected" id="selected-text-color">White</span>
-          </div>
-          <div class="barnacle-swatches">
-            <label class="barnacle-swatch" title="Black" data-field="text-color" data-value="Black">
-              <input type="radio" name="barnacle_text_color" value="Black" />
-              <div class="barnacle-swatch__dot" style="background:#1a1a1a;"></div>
-            </label>
-            <label class="barnacle-swatch selected" title="White" data-field="text-color" data-value="White">
-              <input type="radio" name="barnacle_text_color" value="White" checked />
-              <div class="barnacle-swatch__dot" style="background:#f8fafc;"></div>
-            </label>
-            <label class="barnacle-swatch" title="Gold" data-field="text-color" data-value="Gold">
-              <input type="radio" name="barnacle_text_color" value="Gold" />
-              <div class="barnacle-swatch__dot" style="background:#d4a017;"></div>
-            </label>
-            <label class="barnacle-swatch" title="Red" data-field="text-color" data-value="Red">
-              <input type="radio" name="barnacle_text_color" value="Red" />
-              <div class="barnacle-swatch__dot" style="background:#c0392b;"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- REFERENCE IMAGE -->
-        <div class="barnacle-field" id="field-image-ref">
-          <div class="barnacle-field__label">
-            <span>Reference Image URL <span style="font-weight:400;color:#94a3b8;">(optional)</span></span>
-          </div>
-          <input
-            type="url"
-            class="barnacle-img-ref"
-            id="barnacle-image-ref"
-            placeholder="https://... or leave blank and email us"
-            autocomplete="off"
-          />
-          <div class="barnacle-field__hint">Paste a link to your logo, artwork, or reference image. You can also email it to us after ordering.</div>
-        </div>
-
+    </div>
+    <div class="feat-row rev">
+      <div class="feat-img"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-wide.jpeg" alt="Two Barnacles on a truck dashboard" loading="lazy" /></div>
+      <div class="feat-text">
+        <div class="ft-eye">On The Road</div>
+        <h3>Sticks to your dash. Stays all day.</h3>
+        <p>No cup holder? No problem. Flat dash, center console, cooler lid &mdash; if it's flat, The Barnacle owns it. Toss it anywhere and it grips like it was made for that spot.</p>
+        <div class="feat-pill">&#128667; Truck-tested, road-approved</div>
       </div>
-
-      <!-- Feature Bullets -->
-      <ul class="barnacle-features">
-        <li>
-          <div class="barnacle-feat-icon">🔄</div>
-          <div><strong>Multi-use &amp; Versatile Fit</strong>Holds cans, bottles, and tumblers of virtually any size.</div>
-        </li>
-        <li>
-          <div class="barnacle-feat-icon">⚓</div>
-          <div><strong>Marine-Friendly Materials</strong>UV-resistant and waterproof — built for salt air, sun, and spray.</div>
-        </li>
-        <li>
-          <div class="barnacle-feat-icon">🌡️</div>
-          <div><strong>Heat &amp; Cold Safe</strong>Won't warp in the sun or crack in the cold.</div>
-        </li>
-        <li>
-          <div class="barnacle-feat-icon">🏗️</div>
-          <div><strong>Durable Construction</strong>Grips any flat surface — no screws, no mess.</div>
-        </li>
-      </ul>
-
-      <!-- Shopify Product Form — line item properties carry all customization data through to the order -->
-      {%- form 'product', current_product, id: 'barnacle-product-form', class: 'barnacle-product-form' -%}
-        <input type="hidden" name="id" value="{{ current_variant.id }}" />
-
-        {%- unless current_product.has_only_default_variant -%}
-          {%- for option in current_product.options_with_values -%}
-            <select name="options[{{ option.name | escape }}]" id="Option-{{ option.position }}" style="display:none;">
-              {%- for value in option.values -%}
-                <option value="{{ value | escape }}"
-                  {%- if option.selected_value == value %} selected="selected"{% endif %}>
-                  {{ value }}
-                </option>
-              {%- endfor -%}
-            </select>
-          {%- endfor -%}
-        {%- endunless -%}
-
-        <!-- LINE ITEM PROPERTIES — these are passed to every order, visible in admin, confirmation email, and webhooks -->
-        <input type="hidden" name="properties[Base Color]" id="prop-base-color" value="Black" />
-        <input type="hidden" name="properties[Ring Pattern]" id="prop-ring-pattern" value="Solid" />
-        <input type="hidden" name="properties[Custom Text]" id="prop-custom-text" value="" />
-        <input type="hidden" name="properties[Font Style]" id="prop-font-style" value="Block" />
-        <input type="hidden" name="properties[Text Color]" id="prop-text-color" value="White" />
-        <input type="hidden" name="properties[Reference Image]" id="prop-image-ref" value="" />
-
-        <button type="submit" name="add" class="barnacle-atc-btn"
-          {%- unless current_variant.available %} disabled{% endunless %}>
-          {%- if current_variant.available -%}
-            Add to Cart &mdash; {{ current_variant.price | money }}
-          {%- else -%}
-            Sold Out
-          {%- endif -%}
-        </button>
-      {%- endform -%}
-
-      <div class="barnacle-trust">
-        <span>🔒 Secure Checkout</span>
-        <span>🚚 Free Shipping</span>
-        <span>↩️ Easy Returns</span>
+    </div>
+    <div class="feat-row">
+      <div class="feat-img"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/can-action-final.png" alt="Can in The Barnacle near rapids" loading="lazy" /></div>
+      <div class="feat-text">
+        <div class="ft-eye">Anywhere You Go</div>
+        <h3>Portable. Grippy. Zero excuses.</h3>
+        <p>Cooler lid, kayak deck, tailgate rail, campsite table &mdash; The Barnacle grips any flat surface. Weighs almost nothing. Fits in your pocket.</p>
+        <div class="feat-pill">&#127957; Trail-ready, tailgate-approved</div>
+      </div>
+    </div>
+    <div class="feat-row rev">
+      <div class="feat-img"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg" alt="The Barnacle holding a phone" loading="lazy" /></div>
+      <div class="feat-text">
+        <div class="ft-eye">More Than a Cup Holder</div>
+        <h3>Holds your phone, your mug, your can &mdash; anything that fits.</h3>
+        <p>The flexible silicone ring stretches to grip drinks from 12 oz cans all the way up to 40 oz tumblers &mdash; and it holds your phone upright too. Patent pending.</p>
+        <div class="feat-pill">&#128241; Patent Pending &mdash; Designed in the USA</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURE GRID -->
-<section class="barnacle-features-section" id="barnacle-features">
-  <div class="inner">
-    <div class="barnacle-section-header">
-      <div class="barnacle-section-eyebrow">In The Wild</div>
-      <h2 class="barnacle-section-title">Stays put wherever you drop it.</h2>
-    </div>
-
-    <div class="barnacle-feature-row">
-      <div class="barnacle-feature-img">
-        <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp?v=1774008226" alt="Yeti tumbler in The Barnacle on the water" loading="lazy" />
+<!-- ====== BUY ====== -->
+<section id="buy">
+  <div class="wrap">
+    <div class="buy-grid">
+      <div>
+        <div class="gal-main"><img id="bl-mainImg" src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="Stanley tumbler in The Barnacle" /></div>
+        <div class="gal-thumbs" id="bl-thumbs">
+          <div class="gal-thumb active" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg" alt="" /></div>
+        </div>
       </div>
-      <div class="barnacle-feature-text">
-        <div class="barnacle-ft-eyebrow">On The Water</div>
-        <h3 class="barnacle-ft-title">Your drink's new best friend.</h3>
-        <p class="barnacle-ft-body">Whether you're out on the open water or docked at the marina, The Barnacle keeps your tumbler locked in place — even when the waves say otherwise.</p>
-        <div class="barnacle-feat-pill">⚓ Boat-tested, water-approved</div>
-      </div>
-    </div>
-
-    <div class="barnacle-feature-row reverse">
-      <div class="barnacle-feature-img">
-        <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/can-action-final.png?v=1774008251" alt="Can in The Barnacle on a cooler" loading="lazy" />
-      </div>
-      <div class="barnacle-feature-text">
-        <div class="barnacle-ft-eyebrow">On The Go</div>
-        <h3 class="barnacle-ft-title">Portable. Grippy. Zero excuses.</h3>
-        <p class="barnacle-ft-body">Cooler lid, tailgate rail, truck bed, kayak deck — if it's flat, The Barnacle owns it. Toss it in your bag and forget it's there until you need it most.</p>
-        <div class="barnacle-feat-pill">🏕️ Trail-ready, tailgate-approved</div>
-      </div>
-    </div>
-
-    <div class="barnacle-feature-row">
-      <div class="barnacle-feature-img">
-        <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/modelo-boat.webp?v=1774008257" alt="Bottle in The Barnacle on a boat" loading="lazy" />
-      </div>
-      <div class="barnacle-feature-text">
-        <div class="barnacle-ft-eyebrow">Bottles Too</div>
-        <h3 class="barnacle-ft-title">Cans, bottles, tumblers — all of them.</h3>
-        <p class="barnacle-ft-body">The Barnacle's adaptive grip cradles everything from a standard 12 oz can to a wide-mouth bottle. One holder. Every drink. Every adventure.</p>
-        <div class="barnacle-feat-pill">🍺 Fits virtually any vessel</div>
+      <div>
+        <div class="prod-label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
+        <h2 class="prod-title">{{ current_product.title | default: 'The Barnacle' }}</h2>
+        <p class="prod-tag">The portable beverage holder that grips any flat surface and holds any drink.</p>
+        <div class="price-row">
+          <span class="price" id="bl-price">{{ current_variant.price | money }}</span>
+          <span class="price-note">USD &bull; Free returns</span>
+        </div>
+        <ul class="feat-list">
+          <li><div class="fi">&#128260;</div><div><strong>Fits Virtually Any Drink</strong>12 oz cans to 40 oz Stanleys &mdash; the flexible ring adjusts to hold any drink.</div></li>
+          <li><div class="fi">&#9875;</div><div><strong>Grips Any Flat Surface</strong>Boat deck, truck dash, cooler lid, kayak &mdash; if it's flat, The Barnacle holds.</div></li>
+          <li><div class="fi">&#127777;</div><div><strong>UV-Resistant &amp; Waterproof</strong>Built for the outdoors &mdash; won't warp in the sun or crack in the cold.</div></li>
+          <li><div class="fi">&#127912;</div><div><strong>Fully Customizable</strong>Pick your base color, upload any pattern, and add your own text below.</div></li>
+        </ul>
+        {%- if current_product != blank -%}
+        {%- form 'product', current_product, id: 'bl-form', class: 'bl-form' -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" />
+          <input type="hidden" name="properties[Base Color]" id="bl-p-color" value="White" />
+          <input type="hidden" name="properties[Ring Pattern]" id="bl-p-pattern" value="Plain" />
+          <input type="hidden" name="properties[Custom Text]" id="bl-p-text" value="" />
+          <input type="hidden" name="properties[Font]" id="bl-p-font" value="Inter" />
+          <input type="hidden" name="properties[Text Color]" id="bl-p-tcolor" value="#0f172a" />
+          <input type="hidden" name="properties[Text Stroke]" id="bl-p-stroke" value="None" />
+          <input type="hidden" name="properties[Text Size]" id="bl-p-size" value="Medium" />
+          <button type="submit" class="atc-btn" id="bl-atcBtn">Add to Cart &mdash; {{ current_variant.price | money }}</button>
+        {%- endform -%}
+        {%- endif -%}
+        <div style="margin-top:16px;border:1.5px dashed rgba(14,165,233,.4);border-radius:14px;padding:16px 20px;background:rgba(14,165,233,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:.82rem;font-weight:700;color:#0ea5e9;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Want it personalized?</div>
+            <div style="font-size:.9rem;color:#475569;">Add custom text, colors &amp; patterns &mdash; scroll down to customize</div>
+          </div>
+          <a href="#cfg" class="btn-p" style="font-size:.88rem;padding:12px 22px;white-space:nowrap;">Customize It &rarr;</a>
+        </div>
+        <div class="trust-row">
+          <span>&#128274; Secure Checkout</span>
+          <span>&#128666; Free Shipping</span>
+          <span>Easy Returns</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STICKY BAR -->
-<div class="barnacle-sticky" id="barnacle-sticky">
-  <div>
-    <div class="barnacle-sticky__name">The Barnacle</div>
-    <div class="barnacle-sticky__price">{{ current_variant.price | money }} &bull; Free Shipping</div>
-  </div>
-  <button class="barnacle-sticky__btn"
-    onclick="document.querySelector('#barnacle-product-form [name=add]').click()">
-    Add to Cart
-  </button>
-</div>
-
-<!-- FOOTER -->
-<footer class="barnacle-footer">
-  <div class="barnacle-footer__inner">
-    <div class="barnacle-footer__brand">The <span>Barnacle</span></div>
-    {%- form 'customer', class: 'barnacle-footer__email' -%}
-      <input type="hidden" name="contact[tags]" value="newsletter" />
-      <input type="email" name="contact[email]" placeholder="Your email address" required aria-label="Email" />
-      <button type="submit">Join the Crew</button>
-    {%- endform -%}
-    <div class="barnacle-footer__links">
-      <a href="{{ pages['privacy-policy'].url | default: '/policies/privacy-policy' }}">Privacy Policy</a>
-      <a href="{{ pages['terms-of-service'].url | default: '/policies/terms-of-service' }}">Terms of Service</a>
-      <a href="{{ pages['shipping-policy'].url | default: '/policies/shipping-policy' }}">Shipping &amp; Returns</a>
-      <a href="/pages/contact">Contact</a>
+<!-- ====== CONFIGURATOR ====== -->
+<section id="cfg">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Make It Yours.</h2>
+      <p class="sec-sub">Choose your base color, upload a pattern or image, and add your custom text &mdash; see it live before you buy.</p>
     </div>
-    <div class="barnacle-footer__copy">&copy; {{ 'now' | date: '%Y' }} The Barnacle. All rights reserved.</div>
+    <div class="cfg-layout">
+      <div class="cfg-preview-wrap">
+        <div class="cfg-preview-lbl">Live Preview</div>
+        <div class="cfg-canvas-wrap">
+          <canvas id="previewCanvas" width="600" height="600"></canvas>
+          <div class="preview-badge">Live Preview Active</div>
+        </div>
+      </div>
+      <div class="cfg-controls">
+        <div>
+          <div class="cfg-grp-title">Step 1 &mdash; Choose Your Base Color</div>
+          <div class="base-swatches">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="b-swatch active" data-c="white" onclick="blSetBase('white',this)"></div>
+              <span class="sw-lbl">White</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="b-swatch" data-c="black" onclick="blSetBase('black',this)"></div>
+              <span class="sw-lbl">Black</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="b-swatch" data-c="pink" onclick="blSetBase('pink',this)"></div>
+              <span class="sw-lbl">Pink</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="cfg-grp-title">Step 2 &mdash; Customize the Ring</div>
+          <div class="upload-zone" id="bl-uploadZone">
+            <input type="file" id="bl-patternUpload" accept="image/*" onchange="blHandleUpload(event)" />
+            <div class="upload-icon">&#128444;</div>
+            <div class="upload-title">Upload Your Image or Pattern</div>
+            <div class="upload-sub">JPG, PNG, or SVG &bull; Any size &mdash; we upscale for print quality</div>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Or pick a preset</div>
+            <div class="preset-btns" id="bl-presets">
+              <button class="preset-btn active" onclick="blSetPreset('none',this)">Plain</button>
+              <button class="preset-btn" onclick="blSetPreset('camo',this)">Camo</button>
+              <button class="preset-btn" onclick="blSetPreset('usa',this)">USA Flag</button>
+              <button class="preset-btn" onclick="blSetPreset('floral',this)">Floral</button>
+            </div>
+          </div>
+          <div class="upload-strip" id="bl-strip"></div>
+        </div>
+        <div>
+          <div class="cfg-grp-title">Step 3 &mdash; Add Your Text</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <input type="text" class="cfg-input" id="bl-textInput" placeholder="e.g. The Crew, Lake Life, Mr. Lund..." maxlength="32" oninput="blRender()" />
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Size</div>
+              <div class="sz-btns">
+                <button class="sz-btn active" onclick="blSetSize('medium',this)">Medium</button>
+                <button class="sz-btn" onclick="blSetSize('large',this)">Large</button>
+              </div>
+            </div>
+            <div class="font-wrap">
+              <div class="font-trigger" id="bl-fontTrigger" onclick="blToggleFont()">
+                <span id="bl-fontLabel" style="font-family:'Inter',sans-serif;">Inter (Default)</span>
+                <span class="chev">&#9660;</span>
+              </div>
+              <div class="font-dd" id="bl-fontDd">
+                <div class="font-search-wrap"><input type="text" placeholder="Search fonts..." id="bl-fontSearch" oninput="blFilterFonts()" /></div>
+                <div id="bl-fontList"></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Color</div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <input type="color" id="bl-textColor" value="#0f172a" oninput="blCurTextColor=this.value;blRender()" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;" />
+                <span style="font-size:.82rem;color:rgba(255,255,255,.5);">Pick any color</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Stroke / Border Color</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                  <input type="checkbox" id="bl-strokeToggle" onchange="blToggleStroke(this.checked)" style="width:16px;height:16px;accent-color:#0ea5e9;cursor:pointer;" />
+                  <span style="font-size:.85rem;color:rgba(255,255,255,.6);">Add stroke</span>
+                </label>
+                <input type="color" id="bl-strokeColor" value="#ffffff" oninput="blCurStrokeColor=this.value;blRender()" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;display:none;" />
+              </div>
+              <div class="stroke-row" id="bl-strokeRow" style="margin-top:12px;display:none;">
+                <span style="font-size:.78rem;color:rgba(255,255,255,.5);">Width</span>
+                <input type="range" id="bl-strokeWidth" min="1" max="8" value="2" oninput="document.getElementById('bl-strokeWidthVal').textContent=this.value+'px';blRender()" />
+                <span class="stroke-val" id="bl-strokeWidthVal">2px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {%- if current_product != blank -%}
+        {%- form 'product', current_product, id: 'bl-cfg-form', class: 'bl-cfg-form' -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" />
+          <input type="hidden" name="properties[Base Color]" id="bl-cp-color" value="White" />
+          <input type="hidden" name="properties[Ring Pattern]" id="bl-cp-pattern" value="Plain" />
+          <input type="hidden" name="properties[Custom Text]" id="bl-cp-text" value="" />
+          <input type="hidden" name="properties[Font]" id="bl-cp-font" value="Inter" />
+          <input type="hidden" name="properties[Text Color]" id="bl-cp-tcolor" value="#0f172a" />
+          <input type="hidden" name="properties[Text Stroke]" id="bl-cp-stroke" value="None" />
+          <input type="hidden" name="properties[Text Size]" id="bl-cp-size" value="Medium" />
+          <button type="submit" class="cfg-cta" id="bl-cfgCta">Add Custom Barnacle to Cart &mdash; $39.99</button>
+        {%- endform -%}
+        {%- else -%}
+        <button class="cfg-cta">Add Custom Barnacle to Cart &mdash; $39.99</button>
+        {%- endif -%}
+        <p style="font-size:.75rem;color:rgba(255,255,255,.35);text-align:center;margin-top:-16px;">+$10 customization fee &bull; Your details are saved with your order.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="bl-footer">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">The <span>Barnacle</span></div>
+      <a href="#buy" class="btn-p" style="font-size:1.05rem;padding:18px 48px;">Get Your Barnacle</a>
+      <div class="footer-links">
+        <a href="/policies/privacy-policy">Privacy Policy</a>
+        <a href="/policies/terms-of-service">Terms of Service</a>
+        <a href="/policies/shipping-policy">Shipping &amp; Returns</a>
+        <a href="/pages/contact">Contact</a>
+      </div>
+      <div class="footer-copy">&copy; 2025 The Beverage Barnacle Co. All rights reserved.</div>
+    </div>
   </div>
 </footer>
 
+</div>
+
+<div id="bl-sticky">
+  <div>
+    <div class="sn">The Barnacle</div>
+    <div class="sp">{{ current_variant.price | money }} &bull; Free Shipping</div>
+  </div>
+  <button class="sb" id="bl-stickyBtn">Add to Cart</button>
+</div>
+
 <script>
-  /* Gallery thumbnails */
-  document.querySelectorAll('.barnacle-gallery__thumb').forEach(function(thumb) {
-    thumb.addEventListener('click', function() {
-      document.querySelectorAll('.barnacle-gallery__thumb').forEach(function(t) { t.classList.remove('active'); });
-      thumb.classList.add('active');
-      var img = document.getElementById('barnacle-main-img');
-      img.style.opacity = '0';
-      setTimeout(function() { img.src = thumb.dataset.src; img.style.opacity = '1'; }, 180);
-    });
+(function(){
+'use strict';
+document.documentElement.classList.add('barnacle-page-active');
+document.body.classList.add('barnacle-page-active');
+
+var mainImg=document.getElementById('bl-mainImg');
+document.querySelectorAll('#bl-thumbs .gal-thumb').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('#bl-thumbs .gal-thumb').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    if(mainImg){mainImg.style.opacity='0';setTimeout(function(){mainImg.src=t.dataset.src;mainImg.style.opacity='1';},180);}
   });
-  document.getElementById('barnacle-main-img').style.transition = 'opacity .18s';
+});
 
-  /* Sticky bar */
-  var buySection = document.getElementById('barnacle-buy');
-  var stickyBar = document.getElementById('barnacle-sticky');
-  if (buySection && stickyBar) {
-    var obs = new IntersectionObserver(function(entries) {
-      stickyBar.classList.toggle('visible', !entries[0].isIntersecting);
-    }, { threshold: 0.1 });
-    obs.observe(buySection);
-  }
+var buyEl=document.getElementById('buy'),sticky=document.getElementById('bl-sticky');
+if(buyEl&&sticky){new IntersectionObserver(function(e){sticky.classList.toggle('vis',!e[0].isIntersecting);},{threshold:0.1}).observe(buyEl);}
+var stickyBtn=document.getElementById('bl-stickyBtn');
+if(stickyBtn){stickyBtn.addEventListener('click',function(){blSyncProps();var f=document.getElementById('bl-form');if(f)f.submit();});}
 
-  /* ---- CUSTOMIZER: sync UI selections to hidden line item property inputs ---- */
-  (function() {
-    // Swatch selectors (color swatches)
-    document.querySelectorAll('.barnacle-swatch').forEach(function(swatch) {
-      swatch.addEventListener('click', function() {
-        var field = swatch.dataset.field;
-        var value = swatch.dataset.value;
-        // Deselect siblings
-        document.querySelectorAll('.barnacle-swatch[data-field="' + field + '"]').forEach(function(s) {
-          s.classList.remove('selected');
-        });
-        swatch.classList.add('selected');
-        swatch.querySelector('input[type=radio]').checked = true;
-        // Update label
-        var labelEl = document.getElementById('selected-' + field);
-        if (labelEl) labelEl.textContent = value;
-        // Update hidden property input
-        var propMap = { 'base-color': 'prop-base-color', 'text-color': 'prop-text-color' };
-        var propId = propMap[field];
-        if (propId) document.getElementById(propId).value = value;
-      });
-    });
+var blCurBase='white',blCurFont='Inter',blCurTextColor='#0f172a',blCurStrokeColor='none',blCurPattern='none',blCurSize='medium';
+var blUploadedImg=null,blPresetImg=null;
 
-    // Pattern swatches
-    document.querySelectorAll('.barnacle-pattern-swatch').forEach(function(swatch) {
-      swatch.addEventListener('click', function() {
-        var field = swatch.dataset.field;
-        var value = swatch.dataset.value;
-        document.querySelectorAll('.barnacle-pattern-swatch[data-field="' + field + '"]').forEach(function(s) {
-          s.classList.remove('selected');
-        });
-        swatch.classList.add('selected');
-        swatch.querySelector('input[type=radio]').checked = true;
-        var labelEl = document.getElementById('selected-' + field);
-        if (labelEl) labelEl.textContent = value;
-        document.getElementById('prop-ring-pattern').value = value;
-      });
-    });
+function blSyncProps(){
+  var textEl=document.getElementById('bl-textInput');
+  var pairs=[
+    ['color',blCurBase.charAt(0).toUpperCase()+blCurBase.slice(1)],
+    ['pattern',blCurPattern==='none'?'Plain':blCurPattern==='uploaded'?'Custom Upload':blCurPattern.charAt(0).toUpperCase()+blCurPattern.slice(1)],
+    ['text',textEl?textEl.value:''],
+    ['font',blCurFont],
+    ['tcolor',blCurTextColor],
+    ['stroke',blCurStrokeColor==='none'?'None':blCurStrokeColor],
+    ['size',blCurSize.charAt(0).toUpperCase()+blCurSize.slice(1)],
+  ];
+  pairs.forEach(function(p){
+    ['bl-p-','bl-cp-'].forEach(function(pfx){var el=document.getElementById(pfx+p[0]);if(el)el.value=p[1];});
+  });
+}
 
-    // Font options
-    document.querySelectorAll('.barnacle-font-option').forEach(function(opt) {
-      opt.addEventListener('click', function() {
-        var field = opt.dataset.field;
-        var value = opt.dataset.value;
-        document.querySelectorAll('.barnacle-font-option[data-field="' + field + '"]').forEach(function(o) {
-          o.classList.remove('selected');
-        });
-        opt.classList.add('selected');
-        opt.querySelector('input[type=radio]').checked = true;
-        var labelEl = document.getElementById('selected-' + field);
-        if (labelEl) labelEl.textContent = value;
-        document.getElementById('prop-font-style').value = value;
-      });
-    });
+window.blSetBase=function(c,el){blCurBase=c;document.querySelectorAll('#bl .b-swatch').forEach(function(s){s.classList.remove('active');});el.classList.add('active');blRender();blSyncProps();};
+window.blSetSize=function(s,el){blCurSize=s;document.querySelectorAll('#bl .sz-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');blRender();blSyncProps();};
+window.blToggleStroke=function(on){var picker=document.getElementById('bl-strokeColor'),row=document.getElementById('bl-strokeRow');if(on){blCurStrokeColor=picker.value;picker.style.display='block';row.style.display='flex';}else{blCurStrokeColor='none';picker.style.display='none';row.style.display='none';}blRender();blSyncProps();};
 
-    // Custom text input
-    var textInput = document.getElementById('barnacle-custom-text');
-    var charCount = document.getElementById('barnacle-char-count');
-    if (textInput) {
-      textInput.addEventListener('input', function() {
-        var len = textInput.value.length;
-        charCount.textContent = len + ' / 20 characters';
-        charCount.classList.toggle('warn', len >= 16);
-        document.getElementById('prop-custom-text').value = textInput.value;
-      });
-    }
+var BL_FONTS=[{n:'Inter',c:'Sans-Serif'},{n:'Roboto',c:'Sans-Serif'},{n:'Oswald',c:'Display'},{n:'Bebas Neue',c:'Display'},{n:'Anton',c:'Display'},{n:'Bangers',c:'Display'},{n:'Permanent Marker',c:'Handwriting'},{n:'Pacifico',c:'Handwriting'},{n:'Lobster',c:'Handwriting'},{n:'Dancing Script',c:'Handwriting'},{n:'Satisfy',c:'Handwriting'},{n:'Righteous',c:'Display'},{n:'Fredoka One',c:'Display'},{n:'Russo One',c:'Display'},{n:'Alfa Slab One',c:'Serif'},{n:'Playfair Display',c:'Serif'},{n:'Merriweather',c:'Serif'},{n:'Lato',c:'Sans-Serif'},{n:'Montserrat',c:'Sans-Serif'},{n:'Raleway',c:'Sans-Serif'},{n:'Exo 2',c:'Sans-Serif'},{n:'Orbitron',c:'Display'},{n:'Cinzel',c:'Serif'},{n:'Abril Fatface',c:'Display'},{n:'Titan One',c:'Display'},{n:'Lilita One',c:'Display'},{n:'Boogaloo',c:'Display'},{n:'Chewy',c:'Display'},{n:'Kalam',c:'Handwriting'}];
+var blLoadedFonts=new Set(['Inter','Permanent Marker']),blFilteredFonts=BL_FONTS.slice();
 
-    // Image reference input
-    var imgRef = document.getElementById('barnacle-image-ref');
-    if (imgRef) {
-      imgRef.addEventListener('input', function() {
-        document.getElementById('prop-image-ref').value = imgRef.value;
-      });
-    }
+window.blToggleFont=function(){var t=document.getElementById('bl-fontTrigger'),d=document.getElementById('bl-fontDd'),open=d.classList.contains('open');t.classList.toggle('open',!open);d.classList.toggle('open',!open);if(!open){blBuildFontList();document.getElementById('bl-fontSearch').focus();}};
+window.blFilterFonts=function(){var q=document.getElementById('bl-fontSearch').value.toLowerCase();blFilteredFonts=BL_FONTS.filter(function(f){return f.n.toLowerCase().includes(q)||f.c.toLowerCase().includes(q);});blBuildFontList();};
+function blBuildFontList(){var list=document.getElementById('bl-fontList');list.innerHTML='';blFilteredFonts.forEach(function(f){var d=document.createElement('div');d.className='font-opt'+(f.n===blCurFont?' sel':'');d.innerHTML='<span>'+f.n+' <small style="opacity:.4;font-size:.75em;">'+f.c+'</small></span><span class="fp" style="font-family:''+f.n+'',sans-serif;">Aa</span>';d.addEventListener('click',function(){blSelectFont(f.n);});list.appendChild(d);});}
+function blSelectFont(name){blCurFont=name;var lbl=document.getElementById('bl-fontLabel');lbl.textContent=name;lbl.style.fontFamily="'"+name+"',sans-serif";document.getElementById('bl-fontTrigger').classList.remove('open');document.getElementById('bl-fontDd').classList.remove('open');if(!blLoadedFonts.has(name)){var link=document.createElement('link');link.rel='stylesheet';link.href='https://fonts.googleapis.com/css2?family='+encodeURIComponent(name)+':wght@400;700&display=swap';document.head.appendChild(link);blLoadedFonts.add(name);setTimeout(blRender,450);}else{blRender();}blBuildFontList();blSyncProps();}
+document.addEventListener('click',function(e){var wrap=document.querySelector('#bl .font-wrap');if(wrap&&!wrap.contains(e.target)){var t=document.getElementById('bl-fontTrigger'),d=document.getElementById('bl-fontDd');if(t)t.classList.remove('open');if(d)d.classList.remove('open');}});
 
-    // Guard: ensure required fields are filled before add to cart
-    var form = document.getElementById('barnacle-product-form');
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        var baseColor = document.getElementById('prop-base-color').value;
-        if (!baseColor) {
-          e.preventDefault();
-          alert('Please select a Base Color before adding to cart.');
-        }
-      });
-    }
-  })();
+var BL_PRESETS={camo:'https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/preset-camo.jpg',usa:'https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/preset-usa-flag.jpg',floral:'https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/preset-floral.jpg'};
+window.blSetPreset=function(name,el){blCurPattern=name;document.querySelectorAll('#bl-presets .preset-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');blUploadedImg=null;if(name==='none'){blPresetImg=null;blRender();}else{var img=new Image();img.crossOrigin='anonymous';img.onload=function(){blPresetImg=img;blRender();};img.src=BL_PRESETS[name];}blSyncProps();};
+
+function blUpscale(img,target){var maxDim=Math.max(img.naturalWidth,img.naturalHeight);if(maxDim>=target)return img;var cw=img.naturalWidth,ch=img.naturalHeight,cur=img;while(Math.max(cw,ch)<target){var scale=Math.min(2,target/Math.max(cw,ch));var off=document.createElement('canvas');off.width=Math.round(cw*scale);off.height=Math.round(ch*scale);var octx=off.getContext('2d');octx.imageSmoothingEnabled=true;octx.imageSmoothingQuality='high';octx.drawImage(cur,0,0,off.width,off.height);var up=new Image();up.src=off.toDataURL('image/png');cur=up;cw=off.width;ch=off.height;}return cur;}
+window.blHandleUpload=function(e){var file=e.target.files[0];if(!file)return;var zone=document.getElementById('bl-uploadZone'),origTitle=zone.querySelector('.upload-title').textContent;zone.querySelector('.upload-title').textContent='Upscaling for print quality...';var reader=new FileReader();reader.onload=function(ev){var img=new Image();img.onload=function(){var up=blUpscale(img,2000);var finalize=function(fi){blUploadedImg=fi;blPresetImg=null;blCurPattern='uploaded';document.querySelectorAll('#bl-presets .preset-btn').forEach(function(b){b.classList.remove('active');});var strip=document.getElementById('bl-strip');strip.innerHTML='';var th=document.createElement('div');th.className='upload-thumb active';th.innerHTML='<img src="'+ev.target.result+'" alt="uploaded" />';strip.appendChild(th);zone.querySelector('.upload-title').textContent=origTitle;blRender();blSyncProps();};if(up.complete)finalize(up);else up.onload=function(){finalize(up);};};img.src=ev.target.result;};reader.readAsDataURL(file);};
+var uploadZone=document.getElementById('bl-uploadZone');if(uploadZone){uploadZone.addEventListener('dragover',function(e){e.preventDefault();uploadZone.classList.add('drag-over');});uploadZone.addEventListener('dragleave',function(){uploadZone.classList.remove('drag-over');});uploadZone.addEventListener('drop',function(e){e.preventDefault();uploadZone.classList.remove('drag-over');var file=e.dataTransfer.files[0];if(file&&file.type.startsWith('image/')){var dt=new DataTransfer();dt.items.add(file);document.getElementById('bl-patternUpload').files=dt.files;blHandleUpload({target:{files:dt.files}});}});}
+
+var canvas=document.getElementById('previewCanvas'),ctx=canvas?canvas.getContext('2d'):null;
+var CX=300,CY=300,R_DISC=278,R_CUP=168,R_HOLE=96,R_TEXT=234;
+var woodBg=new Image();woodBg.crossOrigin='anonymous';woodBg.src='https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-topdown-wood-clean-nodrink.jpg';woodBg.onload=blRender;
+
+function blDrawArcText(text,radius,maxSize,fontFamily,weight,fillColor,strokeColor,strokeW){if(!text||!ctx)return;var MAX_ARC=(120*Math.PI)/180,maxArcLen=radius*MAX_ARC,fontSize=maxSize;ctx.font=weight+' '+fontSize+"px '"+fontFamily+"',sans-serif";var totalW=Array.from(text).reduce(function(s,c){return s+ctx.measureText(c).width*1.05;},0);while(totalW>maxArcLen&&fontSize>10){fontSize--;ctx.font=weight+' '+fontSize+"px '"+fontFamily+"',sans-serif";totalW=Array.from(text).reduce(function(s,c){return s+ctx.measureText(c).width*1.05;},0);}var totalAngle=totalW/radius,midAngle=-Math.PI/2,angle=midAngle-totalAngle/2;ctx.save();for(var i=0;i<text.length;i++){var ch=text[i],cw=ctx.measureText(ch).width*1.05,charAngle=angle+cw/(2*radius);ctx.save();ctx.translate(CX+radius*Math.cos(charAngle),CY+radius*Math.sin(charAngle));ctx.rotate(charAngle+Math.PI/2);ctx.font=weight+' '+fontSize+"px '"+fontFamily+"',sans-serif";ctx.textAlign='center';ctx.textBaseline='alphabetic';if(strokeColor&&strokeColor!=='none'){ctx.strokeStyle=strokeColor;ctx.lineWidth=strokeW*2;ctx.lineJoin='round';ctx.strokeText(ch,0,0);}ctx.fillStyle=fillColor;ctx.fillText(ch,0,0);ctx.restore();angle+=cw/radius;}ctx.restore();}
+
+window.blRender=function(){if(!ctx||!canvas)return;var W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);if(woodBg.complete&&woodBg.naturalWidth>0)ctx.drawImage(woodBg,0,0,W,H);else{ctx.fillStyle='#c8a96e';ctx.fillRect(0,0,W,H);}ctx.save();ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=36;ctx.shadowOffsetY=10;ctx.beginPath();ctx.arc(CX,CY,R_DISC,0,Math.PI*2);ctx.fillStyle='#555';ctx.fill();ctx.restore();ctx.save();ctx.beginPath();ctx.arc(CX,CY,R_DISC,0,Math.PI*2);ctx.closePath();ctx.clip();var patSrc=blUploadedImg||blPresetImg;if(patSrc){ctx.drawImage(patSrc,CX-R_DISC,CY-R_DISC,R_DISC*2,R_DISC*2);}else{ctx.fillStyle='#9e9e9e';ctx.beginPath();ctx.arc(CX,CY,R_DISC,0,Math.PI*2);ctx.fill();var gg=ctx.createRadialGradient(CX-70,CY-70,20,CX,CY,R_DISC);gg.addColorStop(0,'rgba(255,255,255,.2)');gg.addColorStop(1,'rgba(0,0,0,.15)');ctx.fillStyle=gg;ctx.fillRect(CX-R_DISC,CY-R_DISC,R_DISC*2,R_DISC*2);}ctx.restore();ctx.beginPath();ctx.arc(CX,CY,R_DISC,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=2.5;ctx.stroke();var BC={white:{f:'#f0f0f0',h:'#ffffff',s:'#b8b8b8',r:'#d0d0d0',m:'#e4e4e4'},black:{f:'#1c1c1c',h:'#3a3a3a',s:'#080808',r:'#262626',m:'#242424'},pink:{f:'#ec4899',h:'#f9a8d4',s:'#be185d',r:'#db2777',m:'#f472b6'}};var bc=BC[blCurBase]||BC.white;ctx.save();ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=22;ctx.shadowOffsetY=5;ctx.beginPath();ctx.arc(CX,CY,R_CUP,0,Math.PI*2);ctx.fillStyle=bc.f;ctx.fill();ctx.restore();var cg=ctx.createRadialGradient(CX-42,CY-42,6,CX,CY,R_CUP);cg.addColorStop(0,bc.h);cg.addColorStop(0.3,bc.m);cg.addColorStop(0.75,bc.f);cg.addColorStop(1,bc.s);ctx.beginPath();ctx.arc(CX,CY,R_CUP,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();ctx.beginPath();ctx.arc(CX,CY,R_CUP,0,Math.PI*2);ctx.strokeStyle=bc.r;ctx.lineWidth=3;ctx.stroke();ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=14;ctx.beginPath();ctx.arc(CX,CY,R_HOLE,0,Math.PI*2);ctx.fillStyle='#ffffff';ctx.fill();ctx.restore();ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();var txt=document.getElementById('bl-textInput')?document.getElementById('bl-textInput').value.trim():'';if(txt){var sw=parseInt(document.getElementById('bl-strokeWidth')?document.getElementById('bl-strokeWidth').value:2)||2;var ms=blCurSize==='large'?40:30;blDrawArcText(txt,R_TEXT,ms,blCurFont,'800',blCurTextColor,(blCurStrokeColor&&blCurStrokeColor!=='none')?blCurStrokeColor:null,sw);}var vg=ctx.createRadialGradient(CX,CY,R_DISC*0.72,CX,CY,R_DISC*1.05);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.22)');ctx.save();ctx.beginPath();ctx.arc(CX,CY,R_DISC,0,Math.PI*2);ctx.clip();ctx.fillStyle=vg;ctx.fillRect(CX-R_DISC,CY-R_DISC,R_DISC*2,R_DISC*2);ctx.restore();};
+
+blRender();document.fonts.ready.then(blRender);
+var ti=document.getElementById('bl-textInput');if(ti)ti.addEventListener('input',blSyncProps);
+var tc=document.getElementById('bl-textColor');if(tc)tc.addEventListener('input',blSyncProps);
+})();
 </script>
 
 {% schema %}
@@ -833,51 +673,10 @@
     {
       "type": "product",
       "id": "product",
-      "label": "Product"
-    },
-    {
-      "type": "image_picker",
-      "id": "hero_image",
-      "label": "Hero Background Image"
-    },
-    {
-      "type": "text",
-      "id": "hero_headline",
-      "label": "Hero Headline",
-      "default": "Built for boats, perfected for everywhere else."
-    },
-    {
-      "type": "textarea",
-      "id": "hero_subheadline",
-      "label": "Hero Subheadline",
-      "default": "The portable, multi-use beverage holder designed to fit cans and cups of all sizes. Secure your drink on the water, on the trail, or on the tailgate."
-    },
-    {
-      "type": "text",
-      "id": "product_tagline",
-      "label": "Product Tagline",
-      "default": "Your drink's new best friend — on the water, on the road, or at the tailgate."
-    },
-    {
-      "type": "image_picker",
-      "id": "feature_image_1",
-      "label": "Feature Row 1 Image (On The Water)"
-    },
-    {
-      "type": "image_picker",
-      "id": "feature_image_2",
-      "label": "Feature Row 2 Image (On The Go)"
-    },
-    {
-      "type": "image_picker",
-      "id": "feature_image_3",
-      "label": "Feature Row 3 Image (Bottles)"
+      "label": "Product",
+      "info": "Select The Barnacle (V2) product"
     }
   ],
-  "presets": [
-    {
-      "name": "Barnacle Landing Page"
-    }
-  ]
+  "presets": [{ "name": "Barnacle Landing Page" }]
 }
 {% endschema %}
