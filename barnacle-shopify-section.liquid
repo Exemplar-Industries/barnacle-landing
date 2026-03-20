@@ -1,7 +1,7 @@
 {% comment %}
   ============================================================
   THE BARNACLE — Shopify Liquid Landing Page Section
-  Compatible with: Dawn theme + Optus product customizer
+  Compatible with: Dawn theme — native Shopify line item properties, zero app dependency
   
   HOW TO USE:
   1. In Shopify Admin → Online Store → Themes → Dawn → Edit Code
@@ -9,21 +9,19 @@
   3. Paste this entire file content
   4. In your page template (or home page), add:
        {% section 'barnacle-landing' %}
-  5. Optus automatically injects its customizer UI into the product form
-     because this section uses the standard Shopify product form structure.
-  
-  OPTUS LIVE PREVIEW:
-  - Optus detects the product form via the standard `form 'product'` tag
-  - The #optus-customizer div is where Optus injects its option UI
-  - Live preview works because the product form follows Shopify's standard
-    variant selection pattern that Optus hooks into
-  - No custom JS needed — Optus handles everything via its app embed
+  5. All customization fields (Base Color, Ring Pattern, Custom Text, Font Style,
+     Text Color, Reference Image) are captured as native Shopify line item
+     properties — no app required. Data appears in the order admin view,
+     order confirmation email, and any webhook payload automatically.
   
   SCHEMA at bottom allows customization in the Theme Editor.
   ============================================================
 {% endcomment %}
 
-{%- assign current_product = section.settings.product | default: product -%}
+{%- assign current_product = section.settings.product -%}
+{%- if current_product == blank -%}
+  {%- assign current_product = all_products['the-barnacle-v2'] -%}
+{%- endif -%}
 {%- assign current_variant = current_product.selected_or_first_available_variant -%}
 
 <style>
@@ -124,24 +122,99 @@
   .barnacle-price { font-size: 2.2rem; font-weight: 900; color: #0f172a; }
   .barnacle-price-note { font-size: .85rem; color: #475569; }
 
-  /* Optus customizer wrapper */
+  /* ---- CUSTOMIZER ---- */
   .barnacle-customizer {
-    background: #f8fafc; border-radius: 12px;
-    padding: 20px 24px; margin-bottom: 28px;
+    background: #f8fafc; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 28px;
     border: 1px solid #e2e8f0;
+  }
+  .barnacle-customizer__header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
   }
   .barnacle-customizer__label {
     font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-    color: #475569; margin-bottom: 14px;
+    color: #475569;
   }
-  /* Optus injects inside #barnacle-optus-mount */
-  #barnacle-optus-mount { min-height: 60px; }
-  .barnacle-live-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: .72rem; font-weight: 600; color: #16a34a;
-    background: #dcfce7; border-radius: 50px; padding: 4px 12px; margin-top: 10px;
+  .barnacle-customizer__badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: .68rem; font-weight: 600; color: #16a34a;
+    background: #dcfce7; border-radius: 50px; padding: 3px 10px;
   }
-  .barnacle-live-badge::before { content: '●'; font-size: .6rem; }
+  .barnacle-customizer__badge::before { content: '●'; font-size: .55rem; }
+  .barnacle-field { margin-bottom: 20px; }
+  .barnacle-field:last-child { margin-bottom: 0; }
+  .barnacle-field__label {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .78rem; font-weight: 700; color: #0f172a; margin-bottom: 10px;
+  }
+  .barnacle-field__selected {
+    font-size: .75rem; font-weight: 500; color: #0ea5e9;
+  }
+  /* Swatch grid */
+  .barnacle-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  .barnacle-swatch {
+    position: relative; width: 40px; height: 40px;
+    border-radius: 50%; border: 3px solid transparent;
+    cursor: pointer; transition: border-color .15s, transform .15s;
+    outline: none;
+  }
+  .barnacle-swatch:hover { transform: scale(1.1); }
+  .barnacle-swatch.selected { border-color: #0ea5e9; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0ea5e9; }
+  .barnacle-swatch input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .barnacle-swatch__dot {
+    width: 100%; height: 100%; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,.12);
+  }
+  /* Pattern swatches (larger, rectangular) */
+  .barnacle-pattern-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  .barnacle-pattern-swatch {
+    position: relative; padding: 8px 16px;
+    border-radius: 8px; border: 2px solid #e2e8f0;
+    cursor: pointer; transition: border-color .15s, background .15s;
+    font-size: .8rem; font-weight: 600; color: #475569;
+    background: #fff;
+  }
+  .barnacle-pattern-swatch:hover { border-color: #94a3b8; color: #0f172a; }
+  .barnacle-pattern-swatch.selected { border-color: #0ea5e9; background: rgba(14,165,233,.06); color: #0ea5e9; }
+  .barnacle-pattern-swatch input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+  /* Text input */
+  .barnacle-text-input {
+    width: 100%; padding: 12px 16px;
+    border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: .95rem; color: #0f172a; background: #fff;
+    outline: none; transition: border-color .15s;
+    font-family: inherit;
+  }
+  .barnacle-text-input:focus { border-color: #0ea5e9; }
+  .barnacle-text-input::placeholder { color: #94a3b8; }
+  .barnacle-char-count { font-size: .7rem; color: #94a3b8; text-align: right; margin-top: 4px; }
+  .barnacle-char-count.warn { color: #f59e0b; }
+  /* Font picker */
+  .barnacle-font-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .barnacle-font-option {
+    position: relative; padding: 10px 18px;
+    border-radius: 8px; border: 2px solid #e2e8f0;
+    cursor: pointer; transition: border-color .15s, background .15s;
+    font-size: .95rem; color: #475569; background: #fff;
+  }
+  .barnacle-font-option:hover { border-color: #94a3b8; }
+  .barnacle-font-option.selected { border-color: #0ea5e9; background: rgba(14,165,233,.06); color: #0f172a; }
+  .barnacle-font-option input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .barnacle-font-block { font-family: 'Impact', 'Arial Black', sans-serif; font-weight: 900; }
+  .barnacle-font-script { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
+  .barnacle-font-military { font-family: 'Courier New', 'Courier', monospace; font-weight: 700; letter-spacing: .05em; }
+  .barnacle-font-sans { font-family: 'Arial', 'Helvetica', sans-serif; font-weight: 600; }
+  /* Image reference */
+  .barnacle-img-ref {
+    width: 100%; padding: 12px 16px;
+    border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: .9rem; color: #0f172a; background: #fff;
+    outline: none; transition: border-color .15s;
+    font-family: inherit;
+  }
+  .barnacle-img-ref:focus { border-color: #0ea5e9; }
+  .barnacle-img-ref::placeholder { color: #94a3b8; }
+  .barnacle-field__hint { font-size: .72rem; color: #94a3b8; margin-top: 5px; }
 
   .barnacle-features { list-style: none; margin-bottom: 36px; display: flex; flex-direction: column; gap: 14px; }
   .barnacle-features li { display: flex; align-items: flex-start; gap: 12px; font-size: .95rem; color: #1e293b; line-height: 1.5; }
@@ -319,20 +392,156 @@
         <span class="barnacle-price-note">USD &bull; Free returns</span>
       </div>
 
-      <!-- Optus Customizer Mount -->
-      <!-- Optus automatically detects the product form below and injects its UI here -->
-      <div class="barnacle-customizer">
-        <div class="barnacle-customizer__label">Customize Your Barnacle</div>
-        <div id="barnacle-optus-mount">
-          {%- comment -%}
-            Optus injects its customizer UI into this div automatically.
-            No additional code needed — Optus hooks into the product form below.
-            If using Optus "Custom Fields" app, ensure the product form has
-            the standard Shopify structure (which it does below).
-          {%- endcomment -%}
-          {{ current_product.metafields.optus.customizer_html }}
+      <!-- CUSTOMIZER — Native Shopify line item properties, zero app dependency -->
+      <div class="barnacle-customizer" id="barnacle-customizer">
+        <div class="barnacle-customizer__header">
+          <div class="barnacle-customizer__label">Customize Your Barnacle</div>
+          <div class="barnacle-customizer__badge">Live Preview</div>
         </div>
-        <div class="barnacle-live-badge">Live Preview Active</div>
+
+        <!-- BASE COLOR -->
+        <div class="barnacle-field" id="field-base-color">
+          <div class="barnacle-field__label">
+            <span>Base Color</span>
+            <span class="barnacle-field__selected" id="selected-base-color">Black</span>
+          </div>
+          <div class="barnacle-swatches">
+            <label class="barnacle-swatch selected" title="Black" data-field="base-color" data-value="Black">
+              <input type="radio" name="barnacle_base_color" value="Black" checked />
+              <div class="barnacle-swatch__dot" style="background:#1a1a1a;"></div>
+            </label>
+            <label class="barnacle-swatch" title="White" data-field="base-color" data-value="White">
+              <input type="radio" name="barnacle_base_color" value="White" />
+              <div class="barnacle-swatch__dot" style="background:#f8fafc;"></div>
+            </label>
+            <label class="barnacle-swatch" title="Navy" data-field="base-color" data-value="Navy">
+              <input type="radio" name="barnacle_base_color" value="Navy" />
+              <div class="barnacle-swatch__dot" style="background:#1e3a5f;"></div>
+            </label>
+            <label class="barnacle-swatch" title="OD Green" data-field="base-color" data-value="OD Green">
+              <input type="radio" name="barnacle_base_color" value="OD Green" />
+              <div class="barnacle-swatch__dot" style="background:#4a5c3a;"></div>
+            </label>
+            <label class="barnacle-swatch" title="Tan" data-field="base-color" data-value="Tan">
+              <input type="radio" name="barnacle_base_color" value="Tan" />
+              <div class="barnacle-swatch__dot" style="background:#c4a882;"></div>
+            </label>
+            <label class="barnacle-swatch" title="Red" data-field="base-color" data-value="Red">
+              <input type="radio" name="barnacle_base_color" value="Red" />
+              <div class="barnacle-swatch__dot" style="background:#c0392b;"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- RING PATTERN -->
+        <div class="barnacle-field" id="field-ring-pattern">
+          <div class="barnacle-field__label">
+            <span>Ring Pattern</span>
+            <span class="barnacle-field__selected" id="selected-ring-pattern">Solid</span>
+          </div>
+          <div class="barnacle-pattern-swatches">
+            <label class="barnacle-pattern-swatch selected" data-field="ring-pattern" data-value="Solid">
+              <input type="radio" name="barnacle_ring_pattern" value="Solid" checked />
+              Solid
+            </label>
+            <label class="barnacle-pattern-swatch" data-field="ring-pattern" data-value="Stripe">
+              <input type="radio" name="barnacle_ring_pattern" value="Stripe" />
+              Stripe
+            </label>
+            <label class="barnacle-pattern-swatch" data-field="ring-pattern" data-value="Camo">
+              <input type="radio" name="barnacle_ring_pattern" value="Camo" />
+              Camo
+            </label>
+            <label class="barnacle-pattern-swatch" data-field="ring-pattern" data-value="Custom">
+              <input type="radio" name="barnacle_ring_pattern" value="Custom" />
+              Custom
+            </label>
+          </div>
+        </div>
+
+        <!-- CUSTOM TEXT -->
+        <div class="barnacle-field" id="field-custom-text">
+          <div class="barnacle-field__label">
+            <span>Custom Text <span style="font-weight:400;color:#94a3b8;">(optional)</span></span>
+          </div>
+          <input
+            type="text"
+            class="barnacle-text-input"
+            id="barnacle-custom-text"
+            placeholder="e.g. SEMPER FI, LAKE LIFE, your name..."
+            maxlength="20"
+            autocomplete="off"
+          />
+          <div class="barnacle-char-count" id="barnacle-char-count">0 / 20 characters</div>
+        </div>
+
+        <!-- FONT STYLE -->
+        <div class="barnacle-field" id="field-font-style">
+          <div class="barnacle-field__label">
+            <span>Font Style</span>
+            <span class="barnacle-field__selected" id="selected-font-style">Block</span>
+          </div>
+          <div class="barnacle-font-options">
+            <label class="barnacle-font-option barnacle-font-block selected" data-field="font-style" data-value="Block">
+              <input type="radio" name="barnacle_font_style" value="Block" checked />
+              Block
+            </label>
+            <label class="barnacle-font-option barnacle-font-script" data-field="font-style" data-value="Script">
+              <input type="radio" name="barnacle_font_style" value="Script" />
+              Script
+            </label>
+            <label class="barnacle-font-option barnacle-font-military" data-field="font-style" data-value="Military">
+              <input type="radio" name="barnacle_font_style" value="Military" />
+              Military
+            </label>
+            <label class="barnacle-font-option barnacle-font-sans" data-field="font-style" data-value="Sans">
+              <input type="radio" name="barnacle_font_style" value="Sans" />
+              Sans
+            </label>
+          </div>
+        </div>
+
+        <!-- TEXT COLOR -->
+        <div class="barnacle-field" id="field-text-color">
+          <div class="barnacle-field__label">
+            <span>Text Color</span>
+            <span class="barnacle-field__selected" id="selected-text-color">White</span>
+          </div>
+          <div class="barnacle-swatches">
+            <label class="barnacle-swatch" title="Black" data-field="text-color" data-value="Black">
+              <input type="radio" name="barnacle_text_color" value="Black" />
+              <div class="barnacle-swatch__dot" style="background:#1a1a1a;"></div>
+            </label>
+            <label class="barnacle-swatch selected" title="White" data-field="text-color" data-value="White">
+              <input type="radio" name="barnacle_text_color" value="White" checked />
+              <div class="barnacle-swatch__dot" style="background:#f8fafc;"></div>
+            </label>
+            <label class="barnacle-swatch" title="Gold" data-field="text-color" data-value="Gold">
+              <input type="radio" name="barnacle_text_color" value="Gold" />
+              <div class="barnacle-swatch__dot" style="background:#d4a017;"></div>
+            </label>
+            <label class="barnacle-swatch" title="Red" data-field="text-color" data-value="Red">
+              <input type="radio" name="barnacle_text_color" value="Red" />
+              <div class="barnacle-swatch__dot" style="background:#c0392b;"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- REFERENCE IMAGE -->
+        <div class="barnacle-field" id="field-image-ref">
+          <div class="barnacle-field__label">
+            <span>Reference Image URL <span style="font-weight:400;color:#94a3b8;">(optional)</span></span>
+          </div>
+          <input
+            type="url"
+            class="barnacle-img-ref"
+            id="barnacle-image-ref"
+            placeholder="https://... or leave blank and email us"
+            autocomplete="off"
+          />
+          <div class="barnacle-field__hint">Paste a link to your logo, artwork, or reference image. You can also email it to us after ordering.</div>
+        </div>
+
       </div>
 
       <!-- Feature Bullets -->
@@ -355,12 +564,13 @@
         </li>
       </ul>
 
-      <!-- Standard Shopify Product Form — Optus hooks into this -->
+      <!-- Shopify Product Form — line item properties carry all customization data through to the order -->
       {%- form 'product', current_product, id: 'barnacle-product-form', class: 'barnacle-product-form' -%}
         <input type="hidden" name="id" value="{{ current_variant.id }}" />
+
         {%- unless current_product.has_only_default_variant -%}
           {%- for option in current_product.options_with_values -%}
-            <select name="options[{{ option.name | escape }}]" id="Option-{{ option.position }}">
+            <select name="options[{{ option.name | escape }}]" id="Option-{{ option.position }}" style="display:none;">
               {%- for value in option.values -%}
                 <option value="{{ value | escape }}"
                   {%- if option.selected_value == value %} selected="selected"{% endif %}>
@@ -370,6 +580,15 @@
             </select>
           {%- endfor -%}
         {%- endunless -%}
+
+        <!-- LINE ITEM PROPERTIES — these are passed to every order, visible in admin, confirmation email, and webhooks -->
+        <input type="hidden" name="properties[Base Color]" id="prop-base-color" value="Black" />
+        <input type="hidden" name="properties[Ring Pattern]" id="prop-ring-pattern" value="Solid" />
+        <input type="hidden" name="properties[Custom Text]" id="prop-custom-text" value="" />
+        <input type="hidden" name="properties[Font Style]" id="prop-font-style" value="Block" />
+        <input type="hidden" name="properties[Text Color]" id="prop-text-color" value="White" />
+        <input type="hidden" name="properties[Reference Image]" id="prop-image-ref" value="" />
+
         <button type="submit" name="add" class="barnacle-atc-btn"
           {%- unless current_variant.available %} disabled{% endunless %}>
           {%- if current_variant.available -%}
@@ -489,14 +708,93 @@
     obs.observe(buySection);
   }
 
-  /* Variant selection — Optus hooks into this same mechanism */
-  var variantSelects = document.querySelectorAll('#barnacle-product-form select');
-  variantSelects.forEach(function(sel) {
-    sel.addEventListener('change', function() {
-      /* Shopify's native variant.js or Optus will handle price/availability updates */
-      document.dispatchEvent(new CustomEvent('barnacle:variantChanged', { detail: { form: document.getElementById('barnacle-product-form') } }));
+  /* ---- CUSTOMIZER: sync UI selections to hidden line item property inputs ---- */
+  (function() {
+    // Swatch selectors (color swatches)
+    document.querySelectorAll('.barnacle-swatch').forEach(function(swatch) {
+      swatch.addEventListener('click', function() {
+        var field = swatch.dataset.field;
+        var value = swatch.dataset.value;
+        // Deselect siblings
+        document.querySelectorAll('.barnacle-swatch[data-field="' + field + '"]').forEach(function(s) {
+          s.classList.remove('selected');
+        });
+        swatch.classList.add('selected');
+        swatch.querySelector('input[type=radio]').checked = true;
+        // Update label
+        var labelEl = document.getElementById('selected-' + field);
+        if (labelEl) labelEl.textContent = value;
+        // Update hidden property input
+        var propMap = { 'base-color': 'prop-base-color', 'text-color': 'prop-text-color' };
+        var propId = propMap[field];
+        if (propId) document.getElementById(propId).value = value;
+      });
     });
-  });
+
+    // Pattern swatches
+    document.querySelectorAll('.barnacle-pattern-swatch').forEach(function(swatch) {
+      swatch.addEventListener('click', function() {
+        var field = swatch.dataset.field;
+        var value = swatch.dataset.value;
+        document.querySelectorAll('.barnacle-pattern-swatch[data-field="' + field + '"]').forEach(function(s) {
+          s.classList.remove('selected');
+        });
+        swatch.classList.add('selected');
+        swatch.querySelector('input[type=radio]').checked = true;
+        var labelEl = document.getElementById('selected-' + field);
+        if (labelEl) labelEl.textContent = value;
+        document.getElementById('prop-ring-pattern').value = value;
+      });
+    });
+
+    // Font options
+    document.querySelectorAll('.barnacle-font-option').forEach(function(opt) {
+      opt.addEventListener('click', function() {
+        var field = opt.dataset.field;
+        var value = opt.dataset.value;
+        document.querySelectorAll('.barnacle-font-option[data-field="' + field + '"]').forEach(function(o) {
+          o.classList.remove('selected');
+        });
+        opt.classList.add('selected');
+        opt.querySelector('input[type=radio]').checked = true;
+        var labelEl = document.getElementById('selected-' + field);
+        if (labelEl) labelEl.textContent = value;
+        document.getElementById('prop-font-style').value = value;
+      });
+    });
+
+    // Custom text input
+    var textInput = document.getElementById('barnacle-custom-text');
+    var charCount = document.getElementById('barnacle-char-count');
+    if (textInput) {
+      textInput.addEventListener('input', function() {
+        var len = textInput.value.length;
+        charCount.textContent = len + ' / 20 characters';
+        charCount.classList.toggle('warn', len >= 16);
+        document.getElementById('prop-custom-text').value = textInput.value;
+      });
+    }
+
+    // Image reference input
+    var imgRef = document.getElementById('barnacle-image-ref');
+    if (imgRef) {
+      imgRef.addEventListener('input', function() {
+        document.getElementById('prop-image-ref').value = imgRef.value;
+      });
+    }
+
+    // Guard: ensure required fields are filled before add to cart
+    var form = document.getElementById('barnacle-product-form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        var baseColor = document.getElementById('prop-base-color').value;
+        if (!baseColor) {
+          e.preventDefault();
+          alert('Please select a Base Color before adding to cart.');
+        }
+      });
+    }
+  })();
 </script>
 
 {% schema %}
