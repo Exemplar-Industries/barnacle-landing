@@ -198,7 +198,7 @@
 #bl .cfg-grp-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 #bl .cfg-grp-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
 #bl .base-swatches { display: flex; gap: 12px; flex-wrap: wrap; }
-#bl .b-swatch { width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; }
+#bl .b-swatch { display: block !important; width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; }
 #bl .b-swatch:hover { transform: scale(1.12); }
 #bl .b-swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,165,233,.3); }
 #bl .b-swatch[data-c="white"] { background: #f8fafc; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
@@ -306,7 +306,6 @@
   <div class="hero-bg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/hero-hydro-wide.png" alt="The Barnacle lifestyle" fetchpriority="high" /></div>
   <div class="hero-ov"></div>
   <div class="hero-content">
-    <div class="eyebrow">The Barnacle &mdash; Portable Beverage Holder</div>
     <h1>Your drink's new<br><em>best friend.</em></h1>
     <p class="hero-sub">The portable, multi-use beverage holder that grips any flat surface &mdash; on the water, on the road, or wherever the day takes you.</p>
     <div class="hero-ctas">

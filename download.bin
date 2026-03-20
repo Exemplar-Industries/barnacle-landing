@@ -1,0 +1,50 @@
+# The Barnacle — Phase 2 Execution Brief (Shopify + Stripe Integration)
+
+**Client:** Eric (The Barnacle)
+**Deal Structure:** $2,500 flat upfront + 15% gross revenue royalty.
+**Royalty Scope:** Light ongoing maintenance (bug fixes, uptime monitoring) and backend automation brainstorming as the store scales. Marketing, Google Ads, and video creation are separate conversations at a separate price point if Eric ever wants them.
+**Project Goal:** Build the backend engine for The Barnacle. Move from a static landing page to a fully functional e-commerce system with Stripe payments, automated order routing, and customer follow-ups.
+
+## 1. The Deal & Scope
+This is a high-value "whale" client engagement. The $2,500 covers the technical buildout of the payment and fulfillment infrastructure. The 15% royalty covers light ongoing maintenance and backend automation brainstorming only — no Google Ads, no video creation. Those are future upsell conversations.
+
+**Phase 2 Deliverables:**
+- Complete Stripe payment integration.
+- Self-managed shop infrastructure (customizable Stripe products).
+- Automated shipping label generation.
+- Automated email follow-up sequences (order confirmation, abandoned cart).
+- Finalization of the live product configurator (Optus integration).
+
+**What the 15% Royalty Covers (Keep It Simple):**
+- Light maintenance: bug fixes, keeping the store running, uptime.
+- Backend automation brainstorming: as sales come in, identify new automation opportunities to reduce Eric's manual work.
+- That is it. No Google Ads. No video creation. Those are separate engagements at $5k-$10k/month if he ever wants them — present that as a future tier, not part of this deal.
+
+## 2. Technical Execution Plan (For Manus)
+
+### A. Shopify & Stripe Integration
+*Note: Manus can connect to Shopify and build autonomously if provided with a Shopify Partner/Collaborator account or if Brandon logs in via the browser extension and hands over control.*
+1.  **Stripe Setup:** Guide Brandon through the process of having Eric input his banking details into Stripe. Generate the API keys.
+2.  **Shopify Connection:** Integrate Stripe as the primary payment gateway in Shopify. Ensure Apple Pay and Google Pay are enabled for frictionless checkout.
+3.  **Product Configuration:** Set up the customizable Barnacle product in Shopify, ensuring the Optus app correctly handles the "Photo Background Mode" (photo fills the entire disc, text overlays on top, white center hole punched out).
+
+### B. Backend Automation (n8n / Shopify Flow)
+1.  **Order Routing:** Build a workflow that automatically takes the customer's uploaded image and order details and routes them to the manufacturer/printer.
+2.  **Shipping:** Integrate a shipping solution (e.g., ShipStation or Shopify Shipping) to automatically generate labels upon order fulfillment.
+3.  **Email Sequences:** Set up automated flows for:
+    *   Order Confirmation (immediate).
+    *   Shipping Notification (when label is created).
+    *   Abandoned Cart Recovery (1 hour, 24 hours).
+
+### C. Optional Future Tier (Present as Upsell — Not Included in This Deal)
+If Eric asks about growing traffic, present this as a separate engagement:
+- Google Ads management: $2,500/month retainer.
+- Video creation and product marketing: $2,500/month retainer.
+- Full growth package (both): $5,000-$10,000/month.
+This is a whale conversation for later. Do not include it in the Phase 2 scope.
+
+## 3. Instructions for Manus (When executing this build)
+1.  **Start Here:** Ask Brandon to log into the Shopify admin panel via the browser and hand over control, or provide a Shopify Collaborator invite link.
+2.  **Codebase:** Pull the latest code from `github.com/Exemplar-Industries/barnacle-landing`. Review `barnacle-shopify-section.liquid` and `canva-template-notes.txt` to ensure the Optus integration is perfect.
+3.  **Step-by-Step:** Do not attempt to build everything at once. Start with the Stripe integration, test it, then move to the automated order routing.
+4.  **Communication:** Keep Brandon updated with clear, concise progress reports. If a roadblock occurs (e.g., needing Eric's banking info), provide a copy-paste message for Brandon to send to Eric.

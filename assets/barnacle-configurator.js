@@ -4,6 +4,13 @@
 document.documentElement.classList.add('barnacle-page-active');
 document.body.classList.add('barnacle-page-active');
 
+// Inject CSS fixes that bypass Shopify CDN cache
+(function(){
+  var s=document.createElement('style');
+  s.textContent='#bl .b-swatch{display:block!important} #bl .eyebrow{display:none!important}';
+  document.head.appendChild(s);
+})();
+
 var mainImg=document.getElementById('bl-mainImg');
 document.querySelectorAll('#bl-thumbs .gal-thumb').forEach(function(t){
   t.addEventListener('click',function(){
@@ -81,6 +88,7 @@ if(document.readyState==='loading'){
 }else{
   blInitCanvas();
 }
-var ti=document.getElementById('bl-textInput');if(ti)ti.addEventListener('input',blSyncProps);
-var tc=document.getElementById('bl-textColor');if(tc)tc.addEventListener('input',blSyncProps);
+var ti=document.getElementById('bl-textInput');if(ti)ti.addEventListener('input',function(){blSyncProps();blRender();});
+var tc=document.getElementById('bl-textColor');if(tc)tc.addEventListener('input',function(){blCurTextColor=this.value;blRender();blSyncProps();});
+var sc=document.getElementById('bl-strokeColor');if(sc)sc.addEventListener('input',function(){if(blCurStrokeColor!=='none'){blCurStrokeColor=this.value;blRender();blSyncProps();}});
 })();
