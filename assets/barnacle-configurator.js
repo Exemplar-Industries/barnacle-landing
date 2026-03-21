@@ -71,8 +71,8 @@ var R_DISC=278;
 var R_RED_OUTER=176,R_RED_INNER=168;
 var R_CUP=162;
 var R_HOLE=92;
-var R_TOP_TEXT=248;
-var R_BOTTOM_TEXT=248;
+var R_TOP_TEXT=220;
+var R_BOTTOM_TEXT=215;
 var woodBg=null;
 
 // Arc text renderer — supports top arc (flip=false) and bottom arc (flip=true)
@@ -225,12 +225,12 @@ window.blRender=function(){
   var txt=document.getElementById('bl-textInput')?document.getElementById('bl-textInput').value.trim():'';
   if(txt){
     var sw=parseInt(document.getElementById('bl-strokeWidth')?document.getElementById('bl-strokeWidth').value:2)||2;
-    var ms=blCurSize==='large'?42:32;
+    var ms=blCurSize==='large'?58:46;
     blDrawArcText(txt,R_TOP_TEXT,-90,ms,blCurFont,'800',blCurTextColor,(blCurStrokeColor&&blCurStrokeColor!=='none')?blCurStrokeColor:null,sw,false);
   }
 
   // 8. BOTTOM ARC: "The Barnacle Co." — permanent branding on bottom rim
-  blDrawArcText('The Barnacle Co.',R_BOTTOM_TEXT,90,24,'Permanent Marker','800','#111111',null,0,true);
+  blDrawArcText('The Barnacle Co.',R_BOTTOM_TEXT,90,32,'Permanent Marker','800','#111111',null,0,true);
 
   // 9. Outer vignette
   var vg=ctx.createRadialGradient(CX,CY,R_DISC*0.72,CX,CY,R_DISC*1.05);
