@@ -174,29 +174,17 @@ window.blRender=function(){
   ctx.lineWidth=2.5;
   ctx.stroke();
 
-  // 4. Silicone ring band — the visible ring between disc edge and dome, colored by blCurBase
-  // This is the MIDDLE SECTION that updates with color selection
+  // 4. Silicone color map — dome only changes with base color selection
   var BC={
-    white:{f:'#e8e8e8',h:'#f8f8f8',s:'#c0c0c0',r:'#d0d0d0',m:'#e0e0e0'},
-    black:{f:'#222222',h:'#3c3c3c',s:'#101010',r:'#282828',m:'#2a2a2a'},
-    pink: {f:'#ec4899',h:'#fbb6ce',s:'#d6548a',r:'#e879a8',m:'#f472b6'}
+    white:{f:'#e8e8e8',h:'#f8f8f8',s:'#c0c0c0',m:'#e0e0e0'},
+    black:{f:'#222222',h:'#3c3c3c',s:'#101010',m:'#2a2a2a'},
+    pink: {f:'#ec4899',h:'#fbb6ce',s:'#be185d',m:'#f472b6'}
   };
   var bc=BC[blCurBase]||BC.white;
-  // Draw the ring band (annular region between R_DISC and R_CUP)
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(CX,CY,R_DISC,0,Math.PI*2,false);
-  ctx.arc(CX,CY,R_CUP,0,Math.PI*2,true);
-  ctx.closePath();
-  var rg=ctx.createRadialGradient(CX-40,CY-40,R_CUP*0.5,CX,CY,R_DISC);
-  rg.addColorStop(0,bc.h);
-  rg.addColorStop(0.5,bc.m);
-  rg.addColorStop(1,bc.f);
-  ctx.fillStyle=rg;
-  ctx.fill();
-  ctx.restore();
+  // NOTE: No ring band fill here — the outer ring (R_DISC to R_CUP) shows the pattern/image/gray disc
+  // Only the dome (R_CUP) changes color with the silicone selection
 
-  // 5. Silicone cup dome (same base color, 3D shaded)
+  // 5. Silicone cup dome — THIS is the colored element that changes with White/Black/Pink
   ctx.save();
   ctx.shadowColor='rgba(0,0,0,.45)';
   ctx.shadowBlur=22;
