@@ -174,20 +174,29 @@ window.blRender=function(){
   ctx.lineWidth=2.5;
   ctx.stroke();
 
-  // 4. Red accent ring (tight between disc and silicone dome)
-  ctx.beginPath();
-  ctx.arc(CX,CY,(R_RED_OUTER+R_RED_INNER)/2,0,Math.PI*2);
-  ctx.strokeStyle='#e53e3e';
-  ctx.lineWidth=R_RED_OUTER-R_RED_INNER+2;
-  ctx.stroke();
-
-  // 5. Silicone cup dome (base color, 3D shaded)
+  // 4. Silicone ring band — the visible ring between disc edge and dome, colored by blCurBase
+  // This is the MIDDLE SECTION that updates with color selection
   var BC={
-    white:{f:'#f0f0f0',h:'#ffffff',s:'#b8b8b8',r:'#d0d0d0',m:'#e4e4e4'},
-    black:{f:'#1c1c1c',h:'#3a3a3a',s:'#080808',r:'#262626',m:'#242424'},
-    pink: {f:'#ec4899',h:'#f9a8d4',s:'#be185d',r:'#db2777',m:'#f472b6'}
+    white:{f:'#e8e8e8',h:'#f8f8f8',s:'#c0c0c0',r:'#d0d0d0',m:'#e0e0e0'},
+    black:{f:'#222222',h:'#3c3c3c',s:'#101010',r:'#282828',m:'#2a2a2a'},
+    pink: {f:'#ec4899',h:'#fbb6ce',s:'#d6548a',r:'#e879a8',m:'#f472b6'}
   };
   var bc=BC[blCurBase]||BC.white;
+  // Draw the ring band (annular region between R_DISC and R_CUP)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX,CY,R_DISC,0,Math.PI*2,false);
+  ctx.arc(CX,CY,R_CUP,0,Math.PI*2,true);
+  ctx.closePath();
+  var rg=ctx.createRadialGradient(CX-40,CY-40,R_CUP*0.5,CX,CY,R_DISC);
+  rg.addColorStop(0,bc.h);
+  rg.addColorStop(0.5,bc.m);
+  rg.addColorStop(1,bc.f);
+  ctx.fillStyle=rg;
+  ctx.fill();
+  ctx.restore();
+
+  // 5. Silicone cup dome (same base color, 3D shaded)
   ctx.save();
   ctx.shadowColor='rgba(0,0,0,.45)';
   ctx.shadowBlur=22;
@@ -206,11 +215,7 @@ window.blRender=function(){
   ctx.arc(CX,CY,R_CUP,0,Math.PI*2);
   ctx.fillStyle=cg;
   ctx.fill();
-  ctx.beginPath();
-  ctx.arc(CX,CY,R_CUP,0,Math.PI*2);
-  ctx.strokeStyle=bc.r;
-  ctx.lineWidth=3;
-  ctx.stroke();
+  // No dome stroke — edge defined by gradient transition
 
   // 6. White center hole
   ctx.save();
@@ -228,16 +233,16 @@ window.blRender=function(){
   ctx.fillStyle='rgba(0,0,0,.35)';
   ctx.fill();
 
-  // 7. TOP ARC: "The Barnacle Co." — fixed branding, Permanent Marker, top of disc
-  blDrawArcText('The Barnacle Co.',R_TOP_TEXT,-90,26,'Permanent Marker','800','#111111',null,0,false);
-
-  // 8. BOTTOM ARC: customer custom text — reads right-side-up on bottom half
+  // 7. TOP ARC: customer custom text — on top rim, reads outward
   var txt=document.getElementById('bl-textInput')?document.getElementById('bl-textInput').value.trim():'';
   if(txt){
     var sw=parseInt(document.getElementById('bl-strokeWidth')?document.getElementById('bl-strokeWidth').value:2)||2;
     var ms=blCurSize==='large'?42:32;
-    blDrawArcText(txt,R_BOTTOM_TEXT,90,ms,blCurFont,'800',blCurTextColor,(blCurStrokeColor&&blCurStrokeColor!=='none')?blCurStrokeColor:null,sw,true);
+    blDrawArcText(txt,R_TOP_TEXT,-90,ms,blCurFont,'800',blCurTextColor,(blCurStrokeColor&&blCurStrokeColor!=='none')?blCurStrokeColor:null,sw,false);
   }
+
+  // 8. BOTTOM ARC: "The Barnacle Co." — permanent branding on bottom rim
+  blDrawArcText('The Barnacle Co.',R_BOTTOM_TEXT,90,24,'Permanent Marker','800','#111111',null,0,true);
 
   // 9. Outer vignette
   var vg=ctx.createRadialGradient(CX,CY,R_DISC*0.72,CX,CY,R_DISC*1.05);
