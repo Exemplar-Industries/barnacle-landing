@@ -34,6 +34,102 @@
 }
 
 /* ============================================================
+   PRODUCT GALLERY
+============================================================ */
+#bl #bl-products { background: #f8fafc; padding: 80px 0; }
+#bl .bl-pg-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+@media (max-width: 768px) {
+  #bl .bl-pg-row { grid-template-columns: 1fr; gap: 20px; }
+}
+#bl .bl-pg-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(15,23,42,.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform .2s, box-shadow .2s;
+}
+#bl .bl-pg-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(15,23,42,.14); }
+#bl .bl-pg-featured {
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 24px rgba(14,165,233,.2);
+}
+#bl .bl-pg-popular-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 50px;
+  z-index: 2;
+}
+#bl .bl-pg-img-wrap {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+#bl .bl-pg-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+#bl .bl-pg-card:hover .bl-pg-img-wrap img { transform: scale(1.04); }
+#bl .bl-pg-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+#bl .bl-pg-badge {
+  display: inline-block;
+  font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  background: #f1f5f9; color: #64748b;
+  padding: 3px 10px; border-radius: 50px;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+#bl .bl-pg-badge-accent { background: rgba(14,165,233,.12); color: var(--accent); }
+#bl .bl-pg-badge-green { background: rgba(34,197,94,.12); color: #16a34a; }
+#bl .bl-pg-title {
+  font-size: 1.15rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 8px; line-height: 1.3;
+}
+#bl .bl-pg-desc {
+  font-size: .9rem; color: #64748b; line-height: 1.5;
+  margin-bottom: 16px; flex: 1;
+}
+#bl .bl-pg-price {
+  font-size: 1.3rem; font-weight: 800; color: var(--navy);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+#bl .bl-pg-savings {
+  font-size: .8rem; font-weight: 700;
+  background: rgba(34,197,94,.15); color: #16a34a;
+  padding: 2px 8px; border-radius: 50px;
+}
+#bl .bl-pg-btn {
+  display: block; text-align: center;
+  background: var(--navy); color: #fff;
+  font-size: .95rem; font-weight: 700;
+  padding: 12px 20px; border-radius: 50px;
+  text-decoration: none;
+  transition: background .2s, transform .15s;
+}
+#bl .bl-pg-btn:hover { background: var(--slate); transform: translateY(-1px); }
+#bl .bl-pg-btn-accent { background: var(--accent); }
+#bl .bl-pg-btn-accent:hover { background: var(--accent-dark); }
+
+/* ============================================================
    RESET
 ============================================================ */
 #bl *, #bl *::before, #bl *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -318,7 +414,6 @@
   </div>
   <div class="scroll-hint"><span>&#8595;</span></div>
 </section>
-
 <!-- ====== FEATURES ====== -->
 <section id="features">
   <div class="wrap">
@@ -381,68 +476,61 @@
     </div>
   </div>
 </section>
-
-<!-- ====== BUY ====== -->
-<section id="buy">
+<!-- ====== PRODUCT GALLERY ====== -->
+<section id="bl-products">
   <div class="wrap">
-    <div class="buy-grid">
-      <div>
-        <div class="gal-main"><img id="bl-mainImg" src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="Stanley tumbler in The Barnacle" /></div>
-        <div class="gal-thumbs" id="bl-thumbs">
-          <div class="gal-thumb active" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg" alt="" /></div>
+    <div class="sec-head">
+      <h2 class="sec-title">Choose Your Barnacle.</h2>
+      <p class="sec-sub">Three ways to own it. Same grip. Same quality. Your call.</p>
+    </div>
+    <div class="bl-pg-row">
+
+      <!-- Card 1: The Barnacle -->
+      <div class="bl-pg-card">
+        <a href="/products/the-barnacle" class="bl-pg-img-wrap">
+          <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="The Barnacle" />
+        </a>
+        <div class="bl-pg-body">
+          <div class="bl-pg-badge">Standard</div>
+          <h3 class="bl-pg-title">The Barnacle</h3>
+          <p class="bl-pg-desc">Choose your silicone color. Grips any flat surface. Holds any drink.</p>
+          <div class="bl-pg-price">$29.99</div>
+          <a href="/products/the-barnacle" class="bl-pg-btn">Shop Now</a>
         </div>
       </div>
-      <div>
-        <div class="prod-label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
-        <h2 class="prod-title">The Barnacle</h2>
-        <p class="prod-tag">The portable beverage holder that grips any flat surface and holds any drink.</p>
-        <div class="price-row">
-          <span class="price" id="bl-price">{{ current_variant.price | money }}</span>
-          <span class="price-note">USD &bull; Free returns</span>
-        </div>
-        <ul class="feat-list">
-          <li><div class="fi">&#128260;</div><div><strong>Fits Virtually Any Drink</strong>12 oz cans to 40 oz Stanleys &mdash; the flexible ring adjusts to hold any drink.</div></li>
-          <li><div class="fi">&#9875;</div><div><strong>Grips Any Flat Surface</strong>Boat deck, truck dash, cooler lid, kayak &mdash; if it's flat, The Barnacle holds.</div></li>
-          <li><div class="fi">&#127777;</div><div><strong>UV-Resistant &amp; Waterproof</strong>Built for the outdoors &mdash; won't warp in the sun or crack in the cold.</div></li>
-          <li><div class="fi">&#127912;</div><div><strong>Fully Customizable</strong>Pick your base color, upload any pattern, and add your own text below.</div></li>
-        </ul>
-        {%- if current_product != blank -%}
-        {%- form 'product', current_product, id: 'bl-form', class: 'bl-form' -%}
-          <input type="hidden" name="id" value="{{ current_variant.id }}" />
-          <input type="hidden" name="properties[Base Color]" id="bl-p-color" value="White" />
-          <input type="hidden" name="properties[Ring Pattern]" id="bl-p-pattern" value="Plain" />
-          <input type="hidden" name="properties[Custom Text]" id="bl-p-text" value="" />
-          <input type="hidden" name="properties[Font]" id="bl-p-font" value="Inter" />
-          <input type="hidden" name="properties[Text Color]" id="bl-p-tcolor" value="#0f172a" />
-          <input type="hidden" name="properties[Text Stroke]" id="bl-p-stroke" value="None" />
-          <input type="hidden" name="properties[Text Size]" id="bl-p-size" value="Medium" />
-          <button type="submit" class="atc-btn" id="bl-atcBtn">Add to Cart &mdash; {{ current_variant.price | money }}</button>
-        {%- endform -%}
-        {%- endif -%}
-        <div style="margin-top:16px;border:1.5px dashed rgba(14,165,233,.4);border-radius:14px;padding:16px 20px;background:rgba(14,165,233,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-          <div>
-            <div style="font-size:.82rem;font-weight:700;color:#0ea5e9;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Want it personalized?</div>
-            <div style="font-size:.9rem;color:#475569;">Add custom text, colors &amp; patterns &mdash; scroll down to customize</div>
-          </div>
-          <a href="#cfg" class="btn-p" style="font-size:.88rem;padding:12px 22px;white-space:nowrap;">Customize It &rarr;</a>
-        </div>
-        <div class="trust-row">
-          <span>&#128274; Secure Checkout</span>
-          <span>&#128666; Free Shipping</span>
-          <span>Easy Returns</span>
+
+      <!-- Card 2: The Barnacle Customized -->
+      <div class="bl-pg-card bl-pg-featured">
+        <div class="bl-pg-popular-badge">Most Popular</div>
+        <a href="/products/the-barnacle-customized" class="bl-pg-img-wrap">
+          <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg" alt="The Barnacle Customized" />
+        </a>
+        <div class="bl-pg-body">
+          <div class="bl-pg-badge bl-pg-badge-accent">Customized</div>
+          <h3 class="bl-pg-title">The Barnacle &mdash; Customized</h3>
+          <p class="bl-pg-desc">Upload your pattern, add your text, pick your color. Live preview before you buy.</p>
+          <div class="bl-pg-price">$39.99</div>
+          <a href="/products/the-barnacle-customized" class="bl-pg-btn bl-pg-btn-accent">Customize Yours</a>
         </div>
       </div>
+
+      <!-- Card 3: The Barnacle 6 Pack -->
+      <div class="bl-pg-card">
+        <a href="/products/the-barnacle-6-pack" class="bl-pg-img-wrap">
+          <img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg" alt="The Barnacle 6 Pack" />
+        </a>
+        <div class="bl-pg-body">
+          <div class="bl-pg-badge bl-pg-badge-green">Best Value</div>
+          <h3 class="bl-pg-title">The Barnacle &mdash; 6 Pack</h3>
+          <p class="bl-pg-desc">Stock up and save $20. Standard or Customized. Perfect for boats, crews, and gifts.</p>
+          <div class="bl-pg-price">From $159.99 <span class="bl-pg-savings">Save $20</span></div>
+          <a href="/products/the-barnacle-6-pack" class="bl-pg-btn">Shop 6 Pack</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
-
 <!-- ====== CONFIGURATOR ====== -->
 <section id="cfg">
   <div class="wrap">
@@ -603,3 +691,63 @@
   "presets": [{ "name": "Barnacle Landing Page" }]
 }
 {% endschema %}
+<!-- ====== BUY ====== -->
+<section id="buy">
+  <div class="wrap">
+    <div class="buy-grid">
+      <div>
+        <div class="gal-main"><img id="bl-mainImg" src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="Stanley tumbler in The Barnacle" /></div>
+        <div class="gal-thumbs" id="bl-thumbs">
+          <div class="gal-thumb active" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg" alt="" /></div>
+          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg" alt="" /></div>
+        </div>
+      </div>
+      <div>
+        <div class="prod-label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
+        <h2 class="prod-title">The Barnacle</h2>
+        <p class="prod-tag">The portable beverage holder that grips any flat surface and holds any drink.</p>
+        <div class="price-row">
+          <span class="price" id="bl-price">{{ current_variant.price | money }}</span>
+          <span class="price-note">USD &bull; Free returns</span>
+        </div>
+        <ul class="feat-list">
+          <li><div class="fi">&#128260;</div><div><strong>Fits Virtually Any Drink</strong>12 oz cans to 40 oz Stanleys &mdash; the flexible ring adjusts to hold any drink.</div></li>
+          <li><div class="fi">&#9875;</div><div><strong>Grips Any Flat Surface</strong>Boat deck, truck dash, cooler lid, kayak &mdash; if it's flat, The Barnacle holds.</div></li>
+          <li><div class="fi">&#127777;</div><div><strong>UV-Resistant &amp; Waterproof</strong>Built for the outdoors &mdash; won't warp in the sun or crack in the cold.</div></li>
+          <li><div class="fi">&#127912;</div><div><strong>Fully Customizable</strong>Pick your base color, upload any pattern, and add your own text below.</div></li>
+        </ul>
+        {%- if current_product != blank -%}
+        {%- form 'product', current_product, id: 'bl-form', class: 'bl-form' -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" />
+          <input type="hidden" name="properties[Base Color]" id="bl-p-color" value="White" />
+          <input type="hidden" name="properties[Ring Pattern]" id="bl-p-pattern" value="Plain" />
+          <input type="hidden" name="properties[Custom Text]" id="bl-p-text" value="" />
+          <input type="hidden" name="properties[Font]" id="bl-p-font" value="Inter" />
+          <input type="hidden" name="properties[Text Color]" id="bl-p-tcolor" value="#0f172a" />
+          <input type="hidden" name="properties[Text Stroke]" id="bl-p-stroke" value="None" />
+          <input type="hidden" name="properties[Text Size]" id="bl-p-size" value="Medium" />
+          <button type="submit" class="atc-btn" id="bl-atcBtn">Add to Cart &mdash; {{ current_variant.price | money }}</button>
+        {%- endform -%}
+        {%- endif -%}
+        <div style="margin-top:16px;border:1.5px dashed rgba(14,165,233,.4);border-radius:14px;padding:16px 20px;background:rgba(14,165,233,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:.82rem;font-weight:700;color:#0ea5e9;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Want it personalized?</div>
+            <div style="font-size:.9rem;color:#475569;">Add custom text, colors &amp; patterns &mdash; scroll down to customize</div>
+          </div>
+          <a href="#cfg" class="btn-p" style="font-size:.88rem;padding:12px 22px;white-space:nowrap;">Customize It &rarr;</a>
+        </div>
+        <div class="trust-row">
+          <span>&#128274; Secure Checkout</span>
+          <span>&#128666; Free Shipping</span>
+          <span>Easy Returns</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
