@@ -656,8 +656,17 @@
 </div>
 
 <script src="{{ 'barnacle-configurator.js' | asset_url }}" defer></script>
-
-
+<script>
+// Auto-scroll to configurator when visiting the Customized product page
+if (window.location.pathname.indexOf('the-barnacle-customized') !== -1) {
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      var cfg = document.getElementById('cfg');
+      if (cfg) { cfg.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }, 400);
+  });
+}
+</script>
 </div>
 {% schema %}
 {
