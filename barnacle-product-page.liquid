@@ -77,18 +77,49 @@
   font-size: 1.3rem;
 }
 
-/* ===== PRODUCT IMAGE ===== */
-#bp-img-wrap {
+/* ===== PRODUCT IMAGE GALLERY ===== */
+#bp-gallery {
   width: 100%;
-  aspect-ratio: 1/1;
-  overflow: hidden;
+  position: relative;
   background: var(--bp-light);
 }
-#bp-img-wrap img {
+#bp-gallery-track {
+  display: flex;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#bp-gallery-track::-webkit-scrollbar { display: none; }
+.bp-gallery-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+}
+.bp-gallery-slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity .3s;
+  display: block;
+}
+#bp-gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0 4px;
+}
+.bp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: background .2s, transform .2s;
+  cursor: pointer;
+}
+.bp-dot.active {
+  background: var(--bp-accent);
+  transform: scale(1.3);
 }
 
 /* ===== PRODUCT INFO ===== */
@@ -306,13 +337,23 @@ document.documentElement.classList.add('barnacle-product-active');
     <a href="/cart" class="bp-cart-icon">&#128722;</a>
   </nav>
 
-  <!-- Product Image -->
-  <div id="bp-img-wrap">
-    {% assign first_image = product.featured_image %}
-    <img id="bp-main-img"
-         src="{{ first_image | img_url: '800x800', crop: 'center' }}"
-         alt="{{ product.title }}"
-         loading="eager">
+  <!-- Product Image Gallery -->
+  <div id="bp-gallery">
+    <div id="bp-gallery-track">
+      {%- assign gallery_images = product.images -%}
+      {%- for image in gallery_images limit: 6 -%}
+      <div class="bp-gallery-slide">
+        <img src="{{ image | img_url: '800x800', crop: 'center' }}"
+             alt="{{ product.title }} - {{ forloop.index }}"
+             loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+      </div>
+      {%- endfor -%}
+    </div>
+    <div id="bp-gallery-dots">
+      {%- for image in gallery_images limit: 6 -%}
+      <div class="bp-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></div>
+      {%- endfor -%}
+    </div>
   </div>
 
   <!-- Product Info -->
@@ -379,6 +420,22 @@ document.documentElement.classList.add('barnacle-product-active');
 <script>
 (function() {
   var selectedVariantId = {{ product.selected_or_first_available_variant.id }};
+
+  // Image gallery scroll dots
+  var track = document.getElementById('bp-gallery-track');
+  var dots = document.querySelectorAll('.bp-dot');
+  if (track && dots.length) {
+    track.addEventListener('scroll', function() {
+      var idx = Math.round(track.scrollLeft / track.offsetWidth);
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+    });
+    dots.forEach(function(dot) {
+      dot.addEventListener('click', function() {
+        var idx = parseInt(this.dataset.index);
+        track.scrollTo({ left: idx * track.offsetWidth, behavior: 'smooth' });
+      });
+    });
+  }
 
   // Swatch click handler
   document.querySelectorAll('.bp-swatch').forEach(function(swatch) {
