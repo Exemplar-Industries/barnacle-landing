@@ -250,34 +250,6 @@
 #bl .feat-pill { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700; color: var(--navy); background: var(--light); border-radius: 50px; padding: 6px 14px; margin-top: 24px; align-self: flex-start; }
 
 /* ============================================================
-   BUY SECTION
-============================================================ */
-#bl #buy { padding: 96px 0; background: #fff; }
-#bl .buy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
-
-#bl .gal-main { border-radius: var(--r); overflow: hidden; aspect-ratio: 1/1; background: var(--light); cursor: default; }
-#bl .gal-main img { width: 100%; height: 100%; object-fit: cover; transition: opacity .18s; display: block; }
-#bl .gal-thumbs { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-#bl .gal-thumb { width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: var(--light); transition: border-color .2s; }
-#bl .gal-thumb.active, #bl .gal-thumb:hover { border-color: var(--accent); }
-#bl .gal-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-#bl .prod-label { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-#bl .prod-title { font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 900; letter-spacing: -.03em; color: var(--navy); margin-bottom: 16px; }
-#bl .prod-tag { font-size: 1.05rem; color: var(--mid); line-height: 1.6; margin-bottom: 20px; }
-#bl .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; }
-#bl .price { font-size: 2.2rem; font-weight: 900; color: var(--navy); }
-#bl .price-note { font-size: .85rem; color: var(--mid); }
-#bl .feat-list { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
-#bl .feat-list li { display: flex; align-items: flex-start; gap: 12px; font-size: .92rem; color: var(--slate); line-height: 1.5; }
-#bl .feat-list strong { display: block; font-weight: 700; color: var(--navy); }
-#bl .fi { width: 34px; height: 34px; border-radius: 8px; background: rgba(14,165,233,.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
-#bl .atc-btn { width: 100%; padding: 18px 24px; font-size: 1.05rem; font-weight: 800; letter-spacing: .02em; background: var(--navy); color: #fff; border: none; border-radius: 50px; cursor: pointer; transition: background .2s, transform .15s, box-shadow .2s; box-shadow: 0 4px 20px rgba(15,23,42,.25); font-family: inherit; }
-#bl .atc-btn:hover { background: var(--slate); transform: translateY(-2px); }
-#bl .trust-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-size: .78rem; color: var(--mid); margin-top: 10px; }
-#bl .trust-row span { display: flex; align-items: center; gap: 5px; }
-
-/* ============================================================
    CONFIGURATOR SECTION
 ============================================================ */
 #bl #cfg { padding: 96px 0; background: var(--navy); }
@@ -376,7 +348,6 @@
 ============================================================ */
 @media (max-width: 900px) {
   #bl .pain-grid { grid-template-columns: 1fr; }
-  #bl .buy-grid { grid-template-columns: 1fr; gap: 40px; }
   #bl .cfg-layout { grid-template-columns: 1fr; gap: 40px; }
   #bl .cfg-preview-wrap { position: static; }
   #bl .feat-row { grid-template-columns: 1fr; }
@@ -388,8 +359,6 @@
   #bl #buy, #bl #features, #bl #cfg { padding: 64px 0; }
   #bl .feat-text { padding: 32px 24px; }
   #bl-sticky { padding: 12px 16px; }
-  #bl .gal-thumb { width: 60px; height: 60px; }
-  #bl .gal-thumbs { flex-wrap: nowrap; }
   #bl .wrap { padding: 0 16px; }
   #bl #previewCanvas { max-width: 100%; }
   #bl .cfg-canvas-wrap { width: 100%; }
@@ -655,68 +624,6 @@
   </div>
 </section>
 
-<!-- ====== BUY ====== -->
-<section id="buy">
-  <div class="wrap">
-    <div class="buy-grid">
-      <div>
-        <div class="gal-main"><img id="bl-mainImg" src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="Stanley tumbler in The Barnacle" /></div>
-        <div class="gal-thumbs" id="bl-thumbs">
-          <div class="gal-thumb active" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8877_1.webp" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/IMG_8874_1.webp" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-truck-dash-close.jpeg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/YETIFINALNOLOGO.webp" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-color-options-2.jpg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-new-1.jpg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-lifestyle-1.jpg" alt="" /></div>
-          <div class="gal-thumb" data-src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg"><img src="https://cdn.shopify.com/s/files/1/0701/8437/0218/t/3/assets/barnacle-phone-holder.jpg" alt="" /></div>
-        </div>
-      </div>
-      <div>
-        <div class="prod-label">Free Shipping &bull; Ships in 2&ndash;3 Days</div>
-        <h2 class="prod-title">The Barnacle</h2>
-        <p class="prod-tag">The portable beverage holder that grips any flat surface and holds any drink.</p>
-        <div class="price-row">
-          <span class="price" id="bl-price">{{ current_variant.price | money }}</span>
-          <span class="price-note">USD &bull; Free returns</span>
-        </div>
-        <ul class="feat-list">
-          <li><div class="fi">&#128260;</div><div><strong>Fits Virtually Any Drink</strong>12 oz cans to 40 oz Stanleys &mdash; the flexible ring adjusts to hold any drink.</div></li>
-          <li><div class="fi">&#9875;</div><div><strong>Grips Any Flat Surface</strong>Boat deck, truck dash, cooler lid, kayak &mdash; if it's flat, The Barnacle holds.</div></li>
-          <li><div class="fi">&#127777;</div><div><strong>UV-Resistant &amp; Waterproof</strong>Built for the outdoors &mdash; won't warp in the sun or crack in the cold.</div></li>
-          <li><div class="fi">&#127912;</div><div><strong>Fully Customizable</strong>Pick your base color, upload any pattern, and add your own text below.</div></li>
-        </ul>
-        {%- if current_product != blank -%}
-        {%- form 'product', current_product, id: 'bl-form', class: 'bl-form' -%}
-          <input type="hidden" name="id" value="{{ current_variant.id }}" />
-          <input type="hidden" name="properties[Base Color]" id="bl-p-color" value="White" />
-          <input type="hidden" name="properties[Ring Pattern]" id="bl-p-pattern" value="Plain" />
-          <input type="hidden" name="properties[Custom Text]" id="bl-p-text" value="" />
-          <input type="hidden" name="properties[Font]" id="bl-p-font" value="Inter" />
-          <input type="hidden" name="properties[Text Color]" id="bl-p-tcolor" value="#0f172a" />
-          <input type="hidden" name="properties[Text Stroke]" id="bl-p-stroke" value="None" />
-          <input type="hidden" name="properties[Text Size]" id="bl-p-size" value="Medium" />
-          <button type="submit" class="atc-btn" id="bl-atcBtn">Add to Cart &mdash; {{ current_variant.price | money }}</button>
-        {%- endform -%}
-        {%- endif -%}
-        <div style="margin-top:16px;border:1.5px dashed rgba(14,165,233,.4);border-radius:14px;padding:16px 20px;background:rgba(14,165,233,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-          <div>
-            <div style="font-size:.82rem;font-weight:700;color:#0ea5e9;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Want it personalized?</div>
-            <div style="font-size:.9rem;color:#475569;">Add custom text, colors &amp; patterns &mdash; scroll down to customize</div>
-          </div>
-          <a href="#cfg" class="btn-p" style="font-size:.88rem;padding:12px 22px;white-space:nowrap;">Customize It &rarr;</a>
-        </div>
-        <div class="trust-row">
-          <span>&#128274; Secure Checkout</span>
-          <span>&#128666; Free Shipping</span>
-          <span>Easy Returns</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
 <footer id="bl-footer">
   <div class="wrap">
     <div class="footer-inner">
@@ -733,8 +640,6 @@
   </div>
 </footer>
 
-</div>
-
 <div id="bl-sticky">
   <div>
     <div class="sn">The Barnacle</div>
@@ -745,6 +650,8 @@
 
 <script src="{{ 'barnacle-configurator.js' | asset_url }}" defer></script>
 
+
+</div>
 {% schema %}
 {
   "name": "Barnacle Landing Page",
@@ -759,3 +666,4 @@
   "presets": [{ "name": "Barnacle Landing Page" }]
 }
 {% endschema %}
+
