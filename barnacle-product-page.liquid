@@ -80,46 +80,49 @@
 /* ===== PRODUCT IMAGE GALLERY ===== */
 #bp-gallery {
   width: 100%;
-  position: relative;
   background: var(--bp-light);
 }
-#bp-gallery-track {
-  display: flex;
-  overflow-x: scroll;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-#bp-gallery-track::-webkit-scrollbar { display: none; }
-.bp-gallery-slide {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
+#bp-main-img-wrap {
+  width: 100%;
   aspect-ratio: 1/1;
   overflow: hidden;
+  background: var(--bp-light);
 }
-.bp-gallery-slide img {
+#bp-main-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity .25s;
+}
+#bp-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #fff;
+}
+#bp-thumbs::-webkit-scrollbar { display: none; }
+.bp-thumb {
+  flex: 0 0 68px;
+  height: 68px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color .2s, opacity .2s;
+  opacity: .65;
+}
+.bp-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-#bp-gallery-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 0 4px;
-}
-.bp-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #cbd5e1;
-  transition: background .2s, transform .2s;
-  cursor: pointer;
-}
-.bp-dot.active {
-  background: var(--bp-accent);
-  transform: scale(1.3);
+.bp-thumb.active {
+  border-color: var(--bp-accent);
+  opacity: 1;
 }
 
 /* ===== PRODUCT INFO ===== */
@@ -338,20 +341,23 @@ document.documentElement.classList.add('barnacle-product-active');
   </nav>
 
   <!-- Product Image Gallery -->
+  {%- assign gallery_images = product.images -%}
   <div id="bp-gallery">
-    <div id="bp-gallery-track">
-      {%- assign gallery_images = product.images -%}
-      {%- for image in gallery_images limit: 6 -%}
-      <div class="bp-gallery-slide">
-        <img src="{{ image | img_url: '800x800', crop: 'center' }}"
-             alt="{{ product.title }} - {{ forloop.index }}"
-             loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
-      </div>
-      {%- endfor -%}
+    <div id="bp-main-img-wrap">
+      <img id="bp-main-img"
+           src="{{ gallery_images[0] | img_url: '800x800', crop: 'center' }}"
+           alt="{{ product.title }}"
+           loading="eager">
     </div>
-    <div id="bp-gallery-dots">
+    <div id="bp-thumbs">
       {%- for image in gallery_images limit: 6 -%}
-      <div class="bp-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></div>
+      <div class="bp-thumb {% if forloop.first %}active{% endif %}"
+           data-src="{{ image | img_url: '800x800', crop: 'center' }}"
+           data-index="{{ forloop.index0 }}">
+        <img src="{{ image | img_url: '160x160', crop: 'center' }}"
+             alt="{{ product.title }} view {{ forloop.index }}"
+             loading="lazy">
+      </div>
       {%- endfor -%}
     </div>
   </div>
@@ -421,21 +427,22 @@ document.documentElement.classList.add('barnacle-product-active');
 (function() {
   var selectedVariantId = {{ product.selected_or_first_available_variant.id }};
 
-  // Image gallery scroll dots
-  var track = document.getElementById('bp-gallery-track');
-  var dots = document.querySelectorAll('.bp-dot');
-  if (track && dots.length) {
-    track.addEventListener('scroll', function() {
-      var idx = Math.round(track.scrollLeft / track.offsetWidth);
-      dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+  // Thumbnail tap handler
+  var mainImg = document.getElementById('bp-main-img');
+  var thumbs = document.querySelectorAll('.bp-thumb');
+  thumbs.forEach(function(thumb) {
+    thumb.addEventListener('click', function() {
+      thumbs.forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+      if (mainImg) {
+        mainImg.style.opacity = '0';
+        setTimeout(function() {
+          mainImg.src = thumb.dataset.src;
+          mainImg.style.opacity = '1';
+        }, 150);
+      }
     });
-    dots.forEach(function(dot) {
-      dot.addEventListener('click', function() {
-        var idx = parseInt(this.dataset.index);
-        track.scrollTo({ left: idx * track.offsetWidth, behavior: 'smooth' });
-      });
-    });
-  }
+  });
 
   // Swatch click handler
   document.querySelectorAll('.bp-swatch').forEach(function(swatch) {

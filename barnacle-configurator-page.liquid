@@ -1,195 +1,242 @@
 <style>
-/* ===== STANDALONE CONFIGURATOR PAGE ===== */
-:root {
-  --accent: #0ea5e9;
-  --accent-dark: #0284c7;
-  --navy: #0f172a;
-}
-
-/* Hide Shopify header/footer/nav */
-.barnacle-cfg-active #shopify-section-header,
-.barnacle-cfg-active header.header,
-.barnacle-cfg-active .header-wrapper,
-.barnacle-cfg-active sticky-header,
-.barnacle-cfg-active #shopify-section-announcement-bar,
-.barnacle-cfg-active .announcement-bar,
-.barnacle-cfg-active footer.footer,
-.barnacle-cfg-active #shopify-section-footer,
-.barnacle-cfg-active .shopify-section-group-header-group {
+/* ============================================================
+   HIDE DAWN HEADER / FOOTER / ANNOUNCEMENT BAR
+============================================================ */
+.barnacle-page-active #shopify-section-header,
+.barnacle-page-active header.header,
+.barnacle-page-active .header-wrapper,
+.barnacle-page-active sticky-header,
+.barnacle-page-active #shopify-section-announcement-bar,
+.barnacle-page-active .announcement-bar,
+.barnacle-page-active footer.footer,
+.barnacle-page-active #shopify-section-footer,
+.barnacle-page-active .shopify-section-group-header-group {
   display: none !important;
 }
-.barnacle-cfg-active #MainContent,
-.barnacle-cfg-active main {
-  padding: 0 !important;
-  margin: 0 !important;
+.barnacle-page-active #MainContent,
+.barnacle-page-active main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
-.barnacle-cfg-active .shopify-section,
-.barnacle-cfg-active .shopify-section-group-main-group > .shopify-section {
+/* Zero out ALL Shopify section wrapper padding/margin */
+.barnacle-page-active .shopify-section,
+.barnacle-page-active .shopify-section-group-main-group > .shopify-section {
   padding: 0 !important;
   margin: 0 !important;
 }
 
-/* ===== TOP NAV ===== */
-#bcfg-nav {
+/* ============================================================
+   PRODUCT GALLERY
+============================================================ */
+#bl #bl-products { background: #f8fafc; padding: 80px 0; }
+#bl .bl-pg-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+@media (max-width: 768px) {
+  #bl .bl-pg-row { grid-template-columns: 1fr; gap: 20px; }
+}
+#bl .bl-pg-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(15,23,42,.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform .2s, box-shadow .2s;
+}
+#bl .bl-pg-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(15,23,42,.14); }
+#bl .bl-pg-featured {
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 24px rgba(14,165,233,.2);
+}
+#bl .bl-pg-popular-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 50px;
+  z-index: 2;
+}
+#bl .bl-pg-img-wrap {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+#bl .bl-pg-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+#bl .bl-pg-card:hover .bl-pg-img-wrap img { transform: scale(1.04); }
+#bl .bl-pg-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+#bl .bl-pg-badge {
+  display: inline-block;
+  font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  background: #f1f5f9; color: #64748b;
+  padding: 3px 10px; border-radius: 50px;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+#bl .bl-pg-badge-accent { background: rgba(14,165,233,.12); color: var(--accent); }
+#bl .bl-pg-badge-green { background: rgba(34,197,94,.12); color: #16a34a; }
+#bl .bl-pg-title {
+  font-size: 1.15rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 8px; line-height: 1.3;
+}
+#bl .bl-pg-desc {
+  font-size: .9rem; color: #64748b; line-height: 1.5;
+  margin-bottom: 16px; flex: 1;
+}
+#bl .bl-pg-price {
+  font-size: 1.3rem; font-weight: 800; color: var(--navy);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+#bl .bl-pg-savings {
+  font-size: .8rem; font-weight: 700;
+  background: rgba(34,197,94,.15); color: #16a34a;
+  padding: 2px 8px; border-radius: 50px;
+}
+#bl .bl-pg-btn {
+  display: block; text-align: center;
+  background: var(--navy); color: #fff;
+  font-size: .95rem; font-weight: 700;
+  padding: 12px 20px; border-radius: 50px;
+  text-decoration: none;
+  transition: background .2s, transform .15s;
+}
+#bl .bl-pg-btn:hover { background: var(--slate); transform: translateY(-1px); }
+#bl .bl-pg-btn-accent { background: var(--accent); }
+#bl .bl-pg-btn-accent:hover { background: var(--accent-dark); }
+
+/* ============================================================
+   RESET
+============================================================ */
+#bl *, #bl *::before, #bl *::after { box-sizing: border-box; margin: 0; padding: 0; }
+   CONFIGURATOR SECTION
+============================================================ */
+#bl #cfg { padding: 96px 0; background: var(--navy); }
+#bl #cfg .sec-head { margin-bottom: 64px; }
+#bl #cfg .sec-title { color: #fff; }
+#bl #cfg .sec-sub { color: rgba(255,255,255,.6); }
+#bl .cfg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+#bl .cfg-preview-wrap { position: sticky; top: 24px; }
+#bl .cfg-preview-lbl { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 16px; text-align: center; }
+#bl .cfg-canvas-wrap { position: relative; border-radius: 20px; overflow: hidden; background: #1a1008; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 48px rgba(0,0,0,.5); }
+#bl #previewCanvas { width: 100%; height: 100%; border-radius: 20px; }
+#bl .preview-badge { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px; font-size: .7rem; font-weight: 700; color: #16a34a; background: rgba(22,163,74,.15); border: 1px solid rgba(22,163,74,.3); border-radius: 50px; padding: 5px 14px; white-space: nowrap; }
+#bl .preview-badge::before { content: '\25CF'; font-size: .55rem; }
+#bl .cfg-controls { display: flex; flex-direction: column; gap: 32px; }
+#bl .cfg-grp-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+#bl .cfg-grp-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+#bl .base-swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+#bl .b-swatch { display: block !important; width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; }
+#bl .b-swatch:hover { transform: scale(1.12); }
+#bl .b-swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,165,233,.3); }
+#bl .b-swatch[data-c="white"] { background: #f8fafc; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+#bl .b-swatch[data-c="black"] { background: #1a1a1a; }
+#bl .b-swatch[data-c="pink"]  { background: #ec4899; }
+#bl .sw-lbl { font-size: .75rem; color: rgba(255,255,255,.5); margin-top: 6px; text-align: center; }
+#bl .upload-zone { border: 2px dashed rgba(255,255,255,.2); border-radius: var(--r); padding: 28px 20px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; position: relative; overflow: hidden; }
+#bl .upload-zone:hover, #bl .upload-zone.drag-over { border-color: var(--accent); background: rgba(14,165,233,.05); }
+#bl .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#bl .upload-icon { font-size: 2rem; margin-bottom: 10px; }
+#bl .upload-title { font-size: .9rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+#bl .upload-sub { font-size: .78rem; color: rgba(255,255,255,.4); }
+#bl .upload-strip { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+#bl .upload-thumb { width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255,255,255,.15); cursor: pointer; flex-shrink: 0; transition: border-color .2s; }
+#bl .upload-thumb.active { border-color: var(--accent); }
+#bl .upload-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#bl .preset-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+#bl .preset-btn { padding: 7px 14px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.05); color: rgba(255,255,255,.7); font-size: .78rem; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s, color .2s; font-family: inherit; }
+#bl .preset-btn:hover, #bl .preset-btn.active { background: rgba(14,165,233,.15); border-color: var(--accent); color: #fff; }
+#bl .cfg-input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; color: #fff; font-size: .95rem; outline: none; transition: border-color .2s; font-family: inherit; }
+#bl .cfg-input::placeholder { color: rgba(255,255,255,.3); }
+#bl .cfg-input:focus { border-color: var(--accent); }
+#bl .sz-btns { display: flex; gap: 10px; }
+#bl .sz-btn { padding: 8px 20px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,.2); background: transparent; color: rgba(255,255,255,.6); font-size: .82rem; font-weight: 600; cursor: pointer; transition: all .18s; font-family: inherit; }
+#bl .sz-btn.active, #bl .sz-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+#bl .font-wrap { position: relative; }
+#bl .font-trigger { width: 100%; padding: 13px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; color: #fff; font-size: .95rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s; font-family: inherit; }
+#bl .font-trigger:hover { border-color: rgba(255,255,255,.3); }
+#bl .font-trigger.open { border-color: var(--accent); border-radius: 10px 10px 0 0; }
+#bl .font-trigger .chev { transition: transform .2s; font-size: .7rem; }
+#bl .font-trigger.open .chev { transform: rotate(180deg); }
+#bl .font-dd { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: #1e293b; border: 1px solid rgba(255,255,255,.15); border-top: none; border-radius: 0 0 10px 10px; max-height: 260px; overflow-y: auto; display: none; }
+#bl .font-dd.open { display: block; }
+#bl .font-search-wrap { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+#bl .font-search-wrap input { width: 100%; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 7px 12px; color: #fff; font-size: .85rem; outline: none; font-family: inherit; }
+#bl .font-search-wrap input::placeholder { color: rgba(255,255,255,.3); }
+#bl .font-opt { padding: 11px 16px; cursor: pointer; font-size: .9rem; color: rgba(255,255,255,.8); transition: background .15s; display: flex; align-items: center; justify-content: space-between; }
+#bl .font-opt:hover { background: rgba(255,255,255,.06); }
+#bl .font-opt.sel { color: var(--accent); background: rgba(14,165,233,.08); }
+#bl .font-opt .fp { font-size: 1rem; color: rgba(255,255,255,.5); }
+#bl .stroke-row { display: flex; align-items: center; gap: 14px; }
+#bl .stroke-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+#bl .stroke-val { font-size: .8rem; color: rgba(255,255,255,.6); min-width: 28px; text-align: right; }
+#bl .cfg-cta { width: 100%; padding: 18px 24px; font-size: 1rem; font-weight: 800; background: var(--accent); color: #fff; border: none; border-radius: 50px; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 4px 20px rgba(14,165,233,.35); font-family: inherit; }
+#bl .cfg-cta:hover { background: var(--accent-dark); transform: translateY(-2px); }
+
+/* ============================================================
+
+/* Standalone page adjustments */
+body { background: var(--navy); margin: 0; padding: 0; }
+.cfg-page-header {
+  background: var(--navy);
+  padding: 18px 20px 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  background: var(--navy);
+  gap: 14px;
   border-bottom: 1px solid rgba(255,255,255,.08);
   position: sticky;
   top: 0;
   z-index: 100;
 }
-#bcfg-nav a.bcfg-back {
+.cfg-back-btn {
+  color: rgba(255,255,255,.7);
+  text-decoration: none;
+  font-size: .9rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--accent);
-  text-decoration: none;
-  font-size: .95rem;
-  font-weight: 600;
 }
-#bcfg-nav .bcfg-logo {
+.cfg-back-btn:hover { color: #fff; }
+.cfg-page-title {
+  color: #fff;
   font-size: 1rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -.02em;
-}
-#bcfg-nav .bcfg-cart {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.3rem;
-}
-
-/* ===== CONFIGURATOR WRAPPER ===== */
-#bcfg-wrap {
-  background: var(--navy);
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #fff;
-  padding: 0 0 120px;
-}
-
-#bcfg-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 48px 24px;
-}
-
-#bcfg-header {
+  font-weight: 700;
+  flex: 1;
   text-align: center;
-  margin-bottom: 48px;
 }
-#bcfg-header h1 {
-  font-size: clamp(2rem, 6vw, 3rem);
-  font-weight: 900;
-  letter-spacing: -.03em;
-  margin: 0 0 12px;
-  color: #fff;
-}
-#bcfg-header p {
-  font-size: 1rem;
-  color: rgba(255,255,255,.6);
-  max-width: 480px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-/* Reuse all bl cfg styles but scoped to #bcfg-wrap */
-#bcfg-wrap .cfg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
-#bcfg-wrap .cfg-preview-wrap { position: sticky; top: 80px; }
-#bcfg-wrap .cfg-preview-lbl { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 16px; text-align: center; }
-#bcfg-wrap .cfg-canvas-wrap { position: relative; border-radius: 20px; overflow: hidden; background: #1a1008; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 48px rgba(0,0,0,.5); }
-#bcfg-wrap #previewCanvas { width: 100%; height: 100%; border-radius: 20px; }
-#bcfg-wrap .preview-badge { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.3); color: #0ea5e9; font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; white-space: nowrap; }
-#bcfg-wrap .cfg-controls { display: flex; flex-direction: column; gap: 32px; }
-#bcfg-wrap .cfg-grp-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-#bcfg-wrap .cfg-grp-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
-#bcfg-wrap .color-btns { display: flex; gap: 10px; flex-wrap: wrap; }
-#bcfg-wrap .color-btn { padding: 10px 20px; border-radius: 50px; border: 2px solid rgba(255,255,255,.15); background: transparent; color: rgba(255,255,255,.7); font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
-#bcfg-wrap .color-btn:hover { border-color: rgba(255,255,255,.4); color: #fff; }
-#bcfg-wrap .color-btn.active { border-color: var(--accent); color: #fff; background: rgba(14,165,233,.12); }
-#bcfg-wrap .pat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; }
-#bcfg-wrap .pat-btn { aspect-ratio: 1/1; border-radius: 12px; border: 2px solid rgba(255,255,255,.1); background: rgba(255,255,255,.05); cursor: pointer; overflow: hidden; transition: border-color .2s, transform .15s; display: flex; align-items: center; justify-content: center; font-size: .7rem; color: rgba(255,255,255,.5); text-align: center; padding: 4px; }
-#bcfg-wrap .pat-btn:hover { border-color: rgba(255,255,255,.3); transform: scale(1.04); }
-#bcfg-wrap .pat-btn.active { border-color: var(--accent); }
-#bcfg-wrap .pat-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-#bcfg-wrap .upload-zone { border: 2px dashed rgba(255,255,255,.2); border-radius: 14px; padding: 28px 20px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
-#bcfg-wrap .upload-zone:hover { border-color: var(--accent); background: rgba(14,165,233,.05); }
-#bcfg-wrap .upload-zone p { margin: 8px 0 0; font-size: .82rem; color: rgba(255,255,255,.4); }
-#bcfg-wrap .sz-btns { display: flex; gap: 8px; }
-#bcfg-wrap .sz-btn { padding: 9px 20px; border-radius: 50px; border: 2px solid rgba(255,255,255,.15); background: transparent; color: rgba(255,255,255,.6); font-size: .82rem; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
-#bcfg-wrap .sz-btn.active { border-color: var(--accent); color: #fff; background: rgba(14,165,233,.12); }
-#bcfg-wrap .font-wrap { position: relative; }
-#bcfg-wrap .font-trigger { display: flex; padding: 12px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; color: #fff; font-size: .9rem; cursor: pointer; align-items: center; justify-content: space-between; transition: border-color .2s; font-family: inherit; }
-#bcfg-wrap .font-trigger:hover { border-color: rgba(255,255,255,.3); }
-#bcfg-wrap .font-trigger.open { border-color: var(--accent); border-radius: 10px 10px 0 0; }
-#bcfg-wrap .font-trigger .chev { transition: transform .2s; font-size: .7rem; }
-#bcfg-wrap .font-trigger.open .chev { transform: rotate(180deg); }
-#bcfg-wrap .font-dd { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: #1e293b; border: 1px solid rgba(255,255,255,.15); border-top: none; border-radius: 0 0 10px 10px; max-height: 260px; overflow-y: auto; display: none; }
-#bcfg-wrap .font-dd.open { display: block; }
-#bcfg-wrap .font-search-wrap { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
-#bcfg-wrap .font-search-wrap input { width: 100%; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 7px 12px; color: #fff; font-size: .85rem; outline: none; font-family: inherit; }
-#bcfg-wrap .font-search-wrap input::placeholder { color: rgba(255,255,255,.3); }
-#bcfg-wrap .font-opt { padding: 11px 16px; cursor: pointer; font-size: .9rem; color: rgba(255,255,255,.8); transition: background .15s; display: flex; align-items: center; justify-content: space-between; }
-#bcfg-wrap .font-opt:hover { background: rgba(255,255,255,.06); }
-#bcfg-wrap .font-opt.sel { color: var(--accent); background: rgba(14,165,233,.08); }
-#bcfg-wrap .cfg-input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; color: #fff; font-size: .95rem; outline: none; transition: border-color .2s; font-family: inherit; box-sizing: border-box; }
-#bcfg-wrap .cfg-input::placeholder { color: rgba(255,255,255,.3); }
-#bcfg-wrap .cfg-input:focus { border-color: var(--accent); }
-#bcfg-wrap .stroke-row { display: flex; align-items: center; gap: 14px; }
-#bcfg-wrap .stroke-row input[type="range"] { flex: 1; accent-color: var(--accent); }
-#bcfg-wrap .stroke-val { font-size: .8rem; color: rgba(255,255,255,.6); min-width: 28px; text-align: right; }
-#bcfg-wrap .cfg-cta { width: 100%; padding: 18px 24px; font-size: 1rem; font-weight: 800; background: var(--accent); color: #fff; border: none; border-radius: 50px; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 4px 20px rgba(14,165,233,.35); font-family: inherit; }
-#bcfg-wrap .cfg-cta:hover { background: var(--accent-dark); transform: translateY(-2px); }
-
-/* ===== STICKY BAR ===== */
-#bcfg-sticky {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
-  background: #0f172a; padding: 14px 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  box-shadow: 0 -4px 24px rgba(15,23,42,.4);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-#bcfg-sticky .sn { font-size: .85rem; font-weight: 800; color: #fff; }
-#bcfg-sticky .sp { font-size: .8rem; color: rgba(255,255,255,.6); }
-#bcfg-sticky .sb { flex-shrink: 0; background: var(--accent); color: #fff; font-size: .9rem; font-weight: 800; padding: 13px 28px; border-radius: 50px; border: none; cursor: pointer; transition: background .2s; font-family: inherit; }
-#bcfg-sticky .sb:hover { background: var(--accent-dark); }
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  #bcfg-wrap .cfg-layout { grid-template-columns: 1fr; gap: 40px; }
-  #bcfg-wrap .cfg-preview-wrap { position: static; }
-}
-@media (max-width: 600px) {
-  #bcfg-inner { padding: 24px 16px; }
-  #bcfg-header h1 { font-size: 2rem; }
-  #bcfg-wrap #previewCanvas { max-width: 100%; }
-  #bcfg-wrap .cfg-canvas-wrap { width: 100%; }
-  #bcfg-sticky { padding: 12px 16px; }
-}
+#cfg { padding-top: 40px !important; }
 </style>
 
-<script>document.documentElement.classList.add('barnacle-cfg-active');</script>
+<div class="cfg-page-header">
+  <a href="/products/the-barnacle-customized" class="cfg-back-btn">&#8592; Back</a>
+  <span class="cfg-page-title">Customize Your Barnacle</span>
+</div>
 
-<!-- Nav -->
-<nav id="bcfg-nav">
-  <a href="/products/the-barnacle" class="bcfg-back">&#8592; Back</a>
-  <span class="bcfg-logo">The Barnacle Co.</span>
-  <a href="/cart" class="bcfg-cart">&#128722;</a>
-</nav>
-
-<div id="bcfg-wrap">
-  <div id="bcfg-inner">
-
-    <div id="bcfg-header">
-      <h1>Make It Yours.</h1>
-      <p>Choose your base color, upload a pattern or image, and add your custom text — see it live before you buy.</p>
+<!-- ====== CONFIGURATOR ====== -->
+<section id="cfg">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Make It Yours.</h2>
+      <p class="sec-sub">Choose your base color, upload a pattern or image, and add your custom text &mdash; see it live before you buy.</p>
     </div>
-
     <div class="cfg-layout">
-      <!-- Live Preview -->
       <div class="cfg-preview-wrap">
         <div class="cfg-preview-lbl">Live Preview</div>
         <div class="cfg-canvas-wrap">
@@ -197,84 +244,88 @@
           <div class="preview-badge">Live Preview Active</div>
         </div>
       </div>
-
-      <!-- Controls -->
       <div class="cfg-controls">
-
-        <!-- Step 1: Base Color -->
         <div>
           <div class="cfg-grp-title">Step 1 &mdash; Choose Your Base Color</div>
-          <div class="color-btns">
-            <button class="color-btn active" onclick="blSetColor('White',this)">White</button>
-            <button class="color-btn" onclick="blSetColor('Black',this)">Black</button>
-            <button class="color-btn" onclick="blSetColor('Pink',this)">Pink</button>
+          <div class="base-swatches">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="b-swatch active" data-c="white" onclick="blSetBase('white',this)"></div>
+              <span class="sw-lbl">White</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="b-swatch" data-c="black" onclick="blSetBase('black',this)"></div>
+              <span class="sw-lbl">Black</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div class="b-swatch" data-c="pink" onclick="blSetBase('pink',this)"></div>
+              <span class="sw-lbl">Pink</span>
+            </div>
           </div>
         </div>
-
-        <!-- Step 2: Ring Pattern -->
         <div>
           <div class="cfg-grp-title">Step 2 &mdash; Customize the Ring</div>
-          <div class="pat-grid" id="bl-patGrid">
-            <button class="pat-btn active" onclick="blSetPat('Plain',this)">Plain</button>
-            <button class="pat-btn" onclick="blSetPat('Camo',this)">Camo</button>
-            <button class="pat-btn" onclick="blSetPat('Stripes',this)">Stripes</button>
-            <button class="pat-btn" onclick="blSetPat('Dots',this)">Dots</button>
-            <button class="pat-btn" onclick="blSetPat('Waves',this)">Waves</button>
-            <button class="pat-btn" onclick="blSetPat('Plaid',this)">Plaid</button>
+          <div class="upload-zone" id="bl-uploadZone">
+            <input type="file" id="bl-patternUpload" accept="image/*" onchange="blHandleUpload(event)" />
+            <div class="upload-icon">&#128444;</div>
+            <div class="upload-title">Upload Your Image or Pattern</div>
+            <div class="upload-sub">JPG, PNG, or SVG &bull; Any size &mdash; we upscale for print quality</div>
           </div>
-          <div class="upload-zone" style="margin-top:16px;" onclick="document.getElementById('bcfg-upload').click()">
-            <svg width="28" height="28" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p>Upload your own image or pattern</p>
-            <input type="file" id="bcfg-upload" accept="image/*" style="display:none" onchange="blHandleUpload(this)" />
+          <div style="margin-top:14px;">
+            <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Or pick a preset</div>
+            <div class="preset-btns" id="bl-presets">
+              <button class="preset-btn active" onclick="blSetPreset('none',this)">Plain</button>
+              <button class="preset-btn" onclick="blSetPreset('camo',this)">Camo</button>
+              <button class="preset-btn" onclick="blSetPreset('usa',this)">USA Flag</button>
+              <button class="preset-btn" onclick="blSetPreset('floral',this)">Floral</button>
+            </div>
           </div>
+          <div class="upload-strip" id="bl-strip"></div>
         </div>
-
-        <!-- Step 3: Text -->
         <div>
           <div class="cfg-grp-title">Step 3 &mdash; Add Your Text</div>
-          <input type="text" class="cfg-input" id="bl-textInput" placeholder="e.g. The Crew, Lake Life, Mr. Lund..." maxlength="32" oninput="blRender()" />
-          <div style="margin-top:16px;">
-            <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Size</div>
-            <div class="sz-btns">
-              <button class="sz-btn active" onclick="blSetSize('medium',this)">Medium</button>
-              <button class="sz-btn" onclick="blSetSize('large',this)">Large</button>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <input type="text" class="cfg-input" id="bl-textInput" placeholder="e.g. The Crew, Lake Life, Mr. Lund..." maxlength="32" oninput="blRender()" />
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Size</div>
+              <div class="sz-btns">
+                <button class="sz-btn active" onclick="blSetSize('medium',this)">Medium</button>
+                <button class="sz-btn" onclick="blSetSize('large',this)">Large</button>
+              </div>
             </div>
-          </div>
-          <div class="font-wrap" style="margin-top:16px;">
-            <div class="font-trigger" id="bl-fontTrigger" onclick="blToggleFont()">
-              <span id="bl-fontLabel" style="font-family:'Inter',sans-serif;">Inter (Default)</span>
-              <span class="chev">&#9660;</span>
+            <div class="font-wrap">
+              <div class="font-trigger" id="bl-fontTrigger" onclick="blToggleFont()">
+                <span id="bl-fontLabel" style="font-family:'Inter',sans-serif;">Inter (Default)</span>
+                <span class="chev">&#9660;</span>
+              </div>
+              <div class="font-dd" id="bl-fontDd">
+                <div class="font-search-wrap"><input type="text" placeholder="Search fonts..." id="bl-fontSearch" oninput="blFilterFonts()" /></div>
+                <div id="bl-fontList"></div>
+              </div>
             </div>
-            <div class="font-dd" id="bl-fontDd">
-              <div class="font-search-wrap"><input type="text" placeholder="Search fonts..." id="bl-fontSearch" oninput="blFilterFonts()" /></div>
-              <div id="bl-fontList"></div>
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Color</div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <input type="color" id="bl-textColor" value="#0f172a" oninput="blCurTextColor=this.value;blRender()" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;" />
+                <span style="font-size:.82rem;color:rgba(255,255,255,.5);">Pick any color</span>
+              </div>
             </div>
-          </div>
-          <div style="margin-top:16px;">
-            <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Color</div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <input type="color" id="bl-textColor" value="#0f172a" oninput="blCurTextColor=this.value;blRender()" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;" />
-              <span style="font-size:.82rem;color:rgba(255,255,255,.5);">Pick any color</span>
-            </div>
-          </div>
-          <div style="margin-top:16px;">
-            <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Stroke / Border Color</div>
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                <input type="checkbox" id="bl-strokeToggle" onchange="blToggleStroke(this.checked)" style="width:16px;height:16px;accent-color:#0ea5e9;cursor:pointer;" />
-                <span style="font-size:.85rem;color:rgba(255,255,255,.6);">Add stroke</span>
-              </label>
-              <input type="color" id="bl-strokeColor" value="#ffffff" oninput="blCurStrokeColor=this.value;blRender()" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;display:none;" />
-            </div>
-            <div class="stroke-row" id="bl-strokeRow" style="margin-top:12px;display:none;">
-              <span style="font-size:.78rem;color:rgba(255,255,255,.5);">Width</span>
-              <input type="range" id="bl-strokeWidth" min="1" max="8" value="2" oninput="document.getElementById('bl-strokeWidthVal').textContent=this.value+'px';blRender()" />
-              <span class="stroke-val" id="bl-strokeWidthVal">2px</span>
+            <div>
+              <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Text Stroke / Border Color</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                  <input type="checkbox" id="bl-strokeToggle" onchange="blToggleStroke(this.checked)" style="width:16px;height:16px;accent-color:#0ea5e9;cursor:pointer;" />
+                  <span style="font-size:.85rem;color:rgba(255,255,255,.6);">Add stroke</span>
+                </label>
+                <input type="color" id="bl-strokeColor" value="#ffffff" oninput="blCurStrokeColor=this.value;blRender()" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,.2);background:none;cursor:pointer;padding:2px;display:none;" />
+              </div>
+              <div class="stroke-row" id="bl-strokeRow" style="margin-top:12px;display:none;">
+                <span style="font-size:.78rem;color:rgba(255,255,255,.5);">Width</span>
+                <input type="range" id="bl-strokeWidth" min="1" max="8" value="2" oninput="document.getElementById('bl-strokeWidthVal').textContent=this.value+'px';blRender()" />
+                <span class="stroke-val" id="bl-strokeWidthVal">2px</span>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Add to Cart Form -->
         {%- if current_product != blank -%}
         {%- form 'product', current_product, id: 'bl-cfg-form', class: 'bl-cfg-form' -%}
           <input type="hidden" name="id" value="{{ current_variant.id }}" />
@@ -291,21 +342,11 @@
         <button class="cfg-cta">Add Custom Barnacle to Cart &mdash; $39.99</button>
         {%- endif -%}
         <p style="font-size:.75rem;color:rgba(255,255,255,.35);text-align:center;margin-top:-16px;">+$10 customization fee &bull; Your details are saved with your order.</p>
-
       </div>
     </div>
-
   </div>
-</div>
+</section>
 
-<!-- Sticky bar -->
-<div id="bcfg-sticky">
-  <div>
-    <div class="sn">Custom Barnacle</div>
-    <div class="sp">$39.99 &bull; Free Shipping</div>
-  </div>
-  <button class="sb" onclick="document.getElementById('bl-cfgCta') ? document.getElementById('bl-cfgCta').click() : null">Add to Cart</button>
-</div>
 
 <script src="{{ 'barnacle-configurator.js' | asset_url }}" defer></script>
 
