@@ -1,0 +1,427 @@
+<style>
+/* ===== BARNACLE PRODUCT PAGE ===== */
+:root {
+  --bp-accent: #3db8f5;
+  --bp-accent-dark: #1a9fd8;
+  --bp-slate: #0f172a;
+  --bp-mid: #334155;
+  --bp-light: #f8fafc;
+  --bp-border: #e2e8f0;
+  --bp-radius: 16px;
+}
+
+#bp {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--bp-slate);
+  background: #fff;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 0 120px;
+  overflow-x: hidden;
+}
+
+/* Hide Shopify header/footer/nav */
+.barnacle-product-active #shopify-section-header,
+.barnacle-product-active header.header,
+.barnacle-product-active .header-wrapper,
+.barnacle-product-active sticky-header,
+.barnacle-product-active #shopify-section-announcement-bar,
+.barnacle-product-active .announcement-bar,
+.barnacle-product-active footer.footer,
+.barnacle-product-active #shopify-section-footer,
+.barnacle-product-active .shopify-section-group-header-group {
+  display: none !important;
+}
+.barnacle-product-active #MainContent,
+.barnacle-product-active main {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.barnacle-product-active .shopify-section,
+.barnacle-product-active .shopify-section-group-main-group > .shopify-section {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ===== TOP NAV BAR ===== */
+#bp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--bp-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+#bp-nav a.bp-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--bp-accent);
+  text-decoration: none;
+  font-size: .95rem;
+  font-weight: 600;
+}
+#bp-nav .bp-logo {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--bp-slate);
+  letter-spacing: -.02em;
+}
+#bp-nav .bp-cart-icon {
+  position: relative;
+  color: var(--bp-slate);
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+/* ===== PRODUCT IMAGE ===== */
+#bp-img-wrap {
+  width: 100%;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: var(--bp-light);
+}
+#bp-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity .3s;
+}
+
+/* ===== PRODUCT INFO ===== */
+#bp-info {
+  padding: 24px 20px 0;
+}
+.bp-badge {
+  display: inline-block;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+#bp-title {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  margin: 0 0 8px;
+}
+#bp-subtitle {
+  font-size: 1rem;
+  color: var(--bp-mid);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+#bp-price-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+#bp-price {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--bp-slate);
+}
+.bp-free-ship {
+  font-size: .85rem;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* ===== COLOR SWATCHES ===== */
+#bp-color-section {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid var(--bp-border);
+}
+.bp-section-label {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--bp-mid);
+  margin-bottom: 12px;
+}
+.bp-selected-color {
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--bp-slate);
+  margin-left: 8px;
+}
+#bp-swatches {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bp-swatch {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: border-color .2s, transform .15s;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.bp-swatch:hover { transform: scale(1.08); }
+.bp-swatch.active {
+  border-color: var(--bp-accent);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bp-accent);
+}
+.bp-swatch[data-color="White"] { background: #f0f0f0; }
+.bp-swatch[data-color="Black"] { background: #1a1a2e; }
+.bp-swatch[data-color="Pink"]  { background: #e91e8c; }
+
+/* ===== FEATURES ===== */
+#bp-features {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--bp-border);
+}
+.bp-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bp-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: .95rem;
+  line-height: 1.4;
+  color: var(--bp-mid);
+}
+.bp-feature-list li .bp-check {
+  color: var(--bp-accent);
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ===== CUSTOMIZE CTA ===== */
+#bp-customize-cta {
+  margin: 24px 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  border-radius: var(--bp-radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#bp-customize-cta .bp-cta-text h3 {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+#bp-customize-cta .bp-cta-text p {
+  color: rgba(255,255,255,.7);
+  font-size: .82rem;
+  margin: 0;
+}
+#bp-customize-cta a {
+  background: var(--bp-accent);
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: .85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ===== STICKY ADD TO CART ===== */
+#bp-sticky {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--bp-border);
+  padding: 12px 20px 28px;
+  z-index: 200;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.08);
+}
+#bp-sticky .bp-sticky-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#bp-sticky .bp-sticky-info {
+  flex: 1;
+}
+#bp-sticky .bp-sticky-name {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--bp-slate);
+}
+#bp-sticky .bp-sticky-price {
+  font-size: .85rem;
+  color: var(--bp-mid);
+}
+#bp-atc-btn {
+  background: var(--bp-accent);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  white-space: nowrap;
+}
+#bp-atc-btn:hover { background: var(--bp-accent-dark); transform: translateY(-1px); }
+#bp-atc-btn:active { transform: scale(.97); }
+#bp-atc-btn.loading { opacity: .7; pointer-events: none; }
+
+/* ===== MOBILE ===== */
+@media (max-width: 600px) {
+  #bp-title { font-size: 1.7rem; }
+  #bp-price { font-size: 1.7rem; }
+}
+</style>
+
+<script>
+document.documentElement.classList.add('barnacle-product-active');
+</script>
+
+<div id="bp">
+  <!-- Nav -->
+  <nav id="bp-nav">
+    <a href="/" class="bp-back">&#8592; Back</a>
+    <span class="bp-logo">The Barnacle Co.</span>
+    <a href="/cart" class="bp-cart-icon">&#128722;</a>
+  </nav>
+
+  <!-- Product Image -->
+  <div id="bp-img-wrap">
+    {% assign first_image = product.featured_image %}
+    <img id="bp-main-img"
+         src="{{ first_image | img_url: '800x800', crop: 'center' }}"
+         alt="{{ product.title }}"
+         loading="eager">
+  </div>
+
+  <!-- Product Info -->
+  <div id="bp-info">
+    <span class="bp-badge">Free Shipping</span>
+    <h1 id="bp-title">{{ product.title }}</h1>
+    <p id="bp-subtitle">Choose your silicone color. Grips any flat surface. Holds any drink.</p>
+    <div id="bp-price-row">
+      <span id="bp-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+      <span class="bp-free-ship">&#10003; Free Shipping</span>
+    </div>
+  </div>
+
+  <!-- Color Swatches -->
+  <div id="bp-color-section">
+    <div class="bp-section-label">
+      Silicone Color <span class="bp-selected-color" id="bp-color-label">White</span>
+    </div>
+    <div id="bp-swatches">
+      {% for variant in product.variants %}
+        <div class="bp-swatch {% if forloop.first %}active{% endif %}"
+             data-color="{{ variant.option1 }}"
+             data-variant-id="{{ variant.id }}"
+             data-price="{{ variant.price | money }}"
+             title="{{ variant.option1 }}">
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div id="bp-features">
+    <div class="bp-section-label">What You Get</div>
+    <ul class="bp-feature-list">
+      <li><span class="bp-check">&#10003;</span> Grips any flat surface — boat deck, truck dash, cooler lid, kayak</li>
+      <li><span class="bp-check">&#10003;</span> Fits 12 oz cans, 20 oz bottles, 30 oz tumblers, 40 oz Stanleys</li>
+      <li><span class="bp-check">&#10003;</span> UV-resistant &amp; waterproof — built for the outdoors</li>
+      <li><span class="bp-check">&#10003;</span> No drilling, no installation — just stick and go</li>
+      <li><span class="bp-check">&#10003;</span> Ships in 2–3 days</li>
+    </ul>
+  </div>
+
+  <!-- Customize CTA -->
+  <div id="bp-customize-cta">
+    <div class="bp-cta-text">
+      <h3>Want it custom?</h3>
+      <p>Upload a pattern, add your text, pick any color.</p>
+    </div>
+    <a href="/products/the-barnacle-customized">Customize Yours &#8594;</a>
+  </div>
+</div>
+
+<!-- Sticky Add to Cart -->
+<div id="bp-sticky">
+  <div class="bp-sticky-inner">
+    <div class="bp-sticky-info">
+      <div class="bp-sticky-name">The Barnacle</div>
+      <div class="bp-sticky-price" id="bp-sticky-price">$29.99 &bull; Free Shipping</div>
+    </div>
+    <button id="bp-atc-btn" onclick="bpAddToCart()">Add to Cart</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  var selectedVariantId = {{ product.selected_or_first_available_variant.id }};
+
+  // Swatch click handler
+  document.querySelectorAll('.bp-swatch').forEach(function(swatch) {
+    swatch.addEventListener('click', function() {
+      document.querySelectorAll('.bp-swatch').forEach(function(s) { s.classList.remove('active'); });
+      this.classList.add('active');
+      selectedVariantId = parseInt(this.dataset.variantId);
+      document.getElementById('bp-color-label').textContent = this.dataset.color;
+      document.getElementById('bp-sticky-price').textContent = this.dataset.price + ' \u2022 Free Shipping';
+      document.getElementById('bp-price').textContent = this.dataset.price;
+    });
+  });
+
+  // Add to cart
+  window.bpAddToCart = function() {
+    var btn = document.getElementById('bp-atc-btn');
+    btn.classList.add('loading');
+    btn.textContent = 'Adding...';
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: selectedVariantId, quantity: 1 })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function() {
+      btn.textContent = 'Added!';
+      btn.style.background = '#16a34a';
+      setTimeout(function() {
+        window.location.href = '/cart';
+      }, 800);
+    })
+    .catch(function() {
+      btn.classList.remove('loading');
+      btn.textContent = 'Add to Cart';
+    });
+  };
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Barnacle Product Page",
+  "settings": []
+}
+{% endschema %}
